@@ -1,37 +1,35 @@
-import curses
-
 from Map import *
 class mainUI:
-	def worldUI(self):
+	def worldUI(self, player):
 		i = 0
 		pos = 0
 		loopUI(i, pos, Maps.currentMap, self)
 		mainUI.mapNameUI(self)
 		# CHARACTER
-		mainUI.characterUI(self)
+		mainUI.characterUI(self, player)
 		# INVENTORY
-		mainUI.charInventoryUI(self)
+		mainUI.charInventoryUI(self, player)
 		# COMMANDS
 		mainUI.commandsUI(self)
 
-	def characterUI(self):
-		quickCharacter = [["+-----------------------------+"],
-						  ["| WARRIOR                     |"],
-						  ["| HEALTH: 20 / 20             |"],
-						  ["| MANA:   0 / 0               |"],
-						  ["+-----------------------------+"]]
+	def characterUI(self, player):
+		quickCharacter =   [["+-----------------------------+"],
+							[f"| {player.stats['CLASS']}|"],
+							[f"| HP: {player.stats['HP']} / {player.currentStats['MaxHP']}                 |"],
+							[f"| MP:   {player.stats['MP']} / {player.currentStats['MaxMP']}               |"],
+							["+-----------------------------+"]]
 		i = 6
 		pos = 33
 		loopUI(i, pos, quickCharacter, self)
 
-	def charInventoryUI(self):
-		charInv = [["+-----------------------------+"],
-				   ["| STR: 5   DEF: 3             |"],
-				   ["| HEAD: EMPTY                 |"],
-				   ["| CHEST: LEATHER-BREASTPLATE  |"],
-				   ["| LEFT-ARM: EMPTY             |"],
-				   ["| RIGHT-ARM: WOODEN-SWORD     |"],
-				   ["+-----------------------------+"]]
+	def charInventoryUI(self, player):
+		charInv =  [["+-----------------------------+"],
+					[f"| STR: {player.stats['STR']}   DEF: {player.stats['DEF']}             |"],
+					["| HEAD: EMPTY                 |"],
+					["| CHEST: LEATHER-BREASTPLATE  |"],
+					["| LEFT-ARM: EMPTY             |"],
+					["| RIGHT-ARM: WOODEN-SWORD     |"],
+					["+-----------------------------+"]]
 		i = 0
 		pos = 33
 		loopUI(i, pos, charInv, self)
@@ -47,9 +45,9 @@ class mainUI:
 		loopUI(i, pos, commands, self)
 
 	def mapNameUI(self):
-		mapName = [["+------------------------------+"],
-				   ["|                              |"],
-				   ["+------------------------------+"]]
+		mapName =  [["+------------------------------+"],
+					["|                              |"],
+					["+------------------------------+"]]
 		i = 15
 		pos = 0
 		loopUI(i, pos, mapName, self)

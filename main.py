@@ -1,7 +1,6 @@
 import curses
 from curses import wrapper
 from UI import *
-"""
 class Equipment:
 	# Defense Equipment (Name, Price, EquipLocation, EquipClass, Stats)
 	# Stats: (Attack, AccuracyBoost, Defense, Magic Defense, EvasionBoost, MagicBoost)
@@ -32,39 +31,35 @@ class Equipment:
 	Dagger = {"Dagger", 10, "all", (5, 0, 0, 0, 0, 0)}
 
 class Classes:
-	Level = 1
-	XP = 20
-
 	# Warrior Stats + Factors
 	class Warrior:
-		stats = {"HitPoints": 20, "MagicPoints": 0, "Strength": 5, "Defense": 1, "MagicStrength": 0, "Evasion": 0,
-				 "Accuracy": 80}
-		XPFactor = 1.6
-		nextLevel = {"HealthIncrease": 5, "MagicPointsIncrease": 0, "StrengthIncrease": 1, "MagicStrengthIncrease": 0,
-					 "EvasionIncrease": 1, "AccuracyIncrease": 1}
+		stats = {"CLASS": "WARRIOR", "HP": 20, "MP": 0, "STR": 5, "DEF": 1}
+		nextLevel = {"HPIncrease": 5, "MPIncrease": 0, "STRIncrease": 1}
 
 	# Mage Stats + Factors
 	class Mage:
-		stats = {"HitPoints": 20, "MagicPoints": 20, "Strength": 1, "Defense": 0, "MagicStrength": 5, "Evasion": 0,
-				 "Accuracy": 50}
-		XPFactor = 1.5
-		nextLevel = {"HealthIncrease": 2, "MagicPointsIncrease": 5, "StrengthIncrease": 1, "MagicStrengthIncrease": 1,
-					 "EvasionIncrease": 1, "AccuracyIncrease": 1}
+		stats = {"CLASS": "MAGE","HP": 20, "MP": 20, "STR": 1, "DEF": 0}
+		nextLevel = {"HPIncrease": 2, "MPIncrease": 5, "STRIncrease": 1}
 
 	# Thief Stats + Factors
 	class Thief:
-		stats = {"HitPoints": 20, "MagicPoints": 0, "Strength": 3, "Defense": 1, "MagicStrength": 0, "Evasion": 20,
-				 "Accuracy": 70}
-		XPFactor = 1.3;
-		nextLevel = {"HealthIncrease": 3, "MagicPointsIncrease": 0, "StrengthIncrease": 1, "MagicStrengthIncrease": 0,
-					 "EvasionIncrease": 1, "AccuracyIncrease": 1}
-"""
+		stats = {"CLASS": "THIEF", "HP": 20, "MP": 0, "STR": 3, "DEF": 0}
+		nextLevel = {"HPIncrease": 3, "MPIncrease": 0, "STRIncrease": 1}
+
+class Player(object):
+	def __init__(self,stats, nextLevel):
+		Level = 1
+		XP = 20
+		self.currentStats = {"MaxHP": stats["HP"], "MaxMP": stats["MP"]}
+		self.stats = {"CLASS": stats["CLASS"], "HP": stats["HP"], "MP": stats["MP"], "STR": stats["STR"], "DEF": stats["DEF"]}
+		self.nextLevel = {"HPIncrease": nextLevel["HPIncrease"], "MPIncrease": nextLevel["MPIncrease"], "STRIncrease": nextLevel["STRIncrease"]}
+
 def my_raw_input(screen, r, c, prompt_string, charlength):
-    curses.echo()
-    screen.addstr(r, c, prompt_string)
-    screen.refresh()
-    input = screen.getstr(r + 1, c, charlength)
-    return input  #       ^^^^  reading input at next line
+	curses.echo()
+	screen.addstr(r, c, prompt_string)
+	screen.refresh()
+	input = screen.getstr(r + 1, c, charlength)
+	return input
 
 def main(main):
 	yCoord = 11
@@ -73,23 +68,29 @@ def main(main):
 	# print(Equipment.Empty)
 	screen = curses.initscr()
 	curses.start_color()
-	curses.use_default_colors()
-	for i in range(0, 16):
-		curses.init_pair(i + 1, i, -1)
 	while True:
 		screen.clear()
-		choice = my_raw_input(screen, 0, 0, "Start Game?", 3).upper().decode("utf-8")
+		screen.addstr(0,0, f"1. Warrior | HP: {str(Classes.Warrior.stats['HP'])} MP: {str(Classes.Warrior.stats['MP'])} STR: {str(Classes.Warrior.stats['STR'])} DEF: {str(Classes.Warrior.stats['DEF'])}")
+		screen.addstr(1,0, f"2. Mage    | HP: {str(Classes.Mage.stats['HP'])} MP: {str(Classes.Mage.stats['MP'])} STR: {str(Classes.Mage.stats['STR'])} DEF: {str(Classes.Mage.stats['DEF'])}")
+		screen.addstr(2,0, f"3. Thief   | HP: {str(Classes.Thief.stats['HP'])} MP: {str(Classes.Thief.stats['MP'])} STR: {str(Classes.Thief.stats['STR'])} DEF: {str(Classes.Thief.stats['DEF'])}")
+		choice = my_raw_input(screen, 3, 0, "Type in a number below:", 1).decode("utf-8")
 		screen.refresh()
-		if choice == "YES":
-			# Update the buffer, adding text at different locations // MAP 15 LINES, 32 LONG
-			mainUI.worldUI(screen)
-			movePlayer(screen, yCoord, xCoord)
+		if choice == "1":
+			player = Player(Classes.Warrior.stats, Classes.Warrior.nextLevel)
+			break
+		elif choice == "2":
+			player = Player(Classes.Mage.stats, Classes.Mage.nextLevel)
+			break
+		elif choice == "3":
+			player = Player(Classes.Thief.stats, Classes.Thief.nextLevel)
 			break
 		else:
 			screen.clear()
-			screen.addstr(0, 0, "why not :((((")
+			screen.addstr(0, 0, "Not an option")
 			screen.refresh()
 			curses.napms(2000)
+	mainUI.worldUI(screen, player)
+	movePlayer(screen, yCoord, xCoord)
 	curses.noecho()
 	curses.curs_set(0)
 	#findPos(yCoord, xCoord)
@@ -101,12 +102,11 @@ def main(main):
 		elif key == curses.KEY_UP:
 			x = detectCollision(yCoord - 1, xCoord)
 			if x:
-				print(yCoord, xCoord)
 				if x == "loadMap":
-					spawnLocation = loadNextMap(spawnLocation, yCoord, xCoord)
+					spawnLocation = respawnData(yCoord, xCoord, spawnLocation)
+					yCoord, xCoord = loadNextMap(yCoord, xCoord, spawnLocation)
 					screen.clear()
-					yCoord, xCoord, spawnLocation = respawnPlayer(spawnLocation)
-					mainUI.worldUI(screen)
+					mainUI.worldUI(screen, player)
 				else:
 					currentPosition(screen, yCoord, xCoord)
 					yCoord -= 1
@@ -115,10 +115,10 @@ def main(main):
 			x = detectCollision(yCoord + 1, xCoord)
 			if x:
 				if x == "loadMap":
-					spawnLocation = loadNextMap(spawnLocation, yCoord, xCoord)
+					spawnLocation = respawnData(yCoord, xCoord, spawnLocation)
+					yCoord, xCoord = loadNextMap(yCoord, xCoord, spawnLocation)
 					screen.clear()
-					yCoord, xCoord, spawnLocation = respawnPlayer(spawnLocation)
-					mainUI.worldUI(screen)
+					mainUI.worldUI(screen, player)
 				else:
 					currentPosition(screen, yCoord, xCoord)
 					yCoord += 1
@@ -127,10 +127,10 @@ def main(main):
 			x = detectCollision(yCoord, xCoord - 1)
 			if x:
 				if x == "loadMap":
-					spawnLocation = loadNextMap(spawnLocation, yCoord, xCoord)
+					spawnLocation = respawnData(yCoord, xCoord, spawnLocation)
+					yCoord, xCoord = loadNextMap(yCoord, xCoord, spawnLocation)
 					screen.clear()
-					yCoord, xCoord, spawnLocation = respawnPlayer(spawnLocation)
-					mainUI.worldUI(screen)
+					mainUI.worldUI(screen, player)
 				else:
 					currentPosition(screen, yCoord, xCoord)
 					xCoord -= 1
@@ -139,21 +139,17 @@ def main(main):
 			x = detectCollision(yCoord, xCoord + 1)
 			if x:
 				if x == "loadMap":
-					spawnLocation = loadNextMap(spawnLocation, yCoord, xCoord)
+					spawnLocation = respawnData(yCoord, xCoord, spawnLocation)
+					yCoord, xCoord = loadNextMap(yCoord, xCoord, spawnLocation)
 					screen.clear()
-					yCoord, xCoord, spawnLocation = respawnPlayer(spawnLocation)
-					mainUI.worldUI(screen)
+					mainUI.worldUI(screen, player)
 				else:
 					currentPosition(screen, yCoord, xCoord)
 					xCoord += 1
 				movePlayer(screen, yCoord, xCoord)
 
-		# Changes go in to the screen buffer and only get
-		# displayed after calling `refresh()` to update
 		screen.refresh()
 	curses.endwin()
 
 if __name__ == "__main__":
-	#townSpawn = [[0, 15], [5, 20], [11, 20]]
-	#print(townSpawn[0][1])
 	wrapper(main)

@@ -26,53 +26,43 @@ class Maps:
 			["+==============================+"]]
 	homeData = {"name": "HOME", "42": "TOWN", "329":"POTION", "429": "POTION"}
 	homeSpawn = [[4, 2]]
-	neighbour_home = [["+==============================+"],
-					  ["ǁ##############################ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁX............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ##############################ǁ"],
-					  ["+==============================+"]]
+	neighbour_home =   [["+==============================+"],
+						["ǁ##############################ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁX............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ#............................#ǁ"],
+						["ǁ##############################ǁ"],
+						["+==============================+"]]
 	neighbour_homeData = {"name": "NEIGHBOURS_HOME", "42": "TOWN", "329": "POTION", "429": "POTION"}
 	neighbour_homeSpawn = [[4, 2]]
 	farm = [["+==============X===============+"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
-			["ǁ..............................ǁ"],
+			["ǁ*************|..##############ǁ"],
+			["ǁ*************|..#............#ǁ"],
+			["ǁ*************|..Q............#ǁ"],
+			["ǁ*************|..#............#ǁ"],
+			["ǁ*************|..#............#ǁ"],
+			["ǁ*************|..##############ǁ"],
+			["ǁ*************|..______________ǁ"],
+			["ǁ*************|.|**************ǁ"],
+			["ǁ*************|.|**************ǁ"],
+			["ǁ*************|.|**************ǁ"],
+			["ǁ*************|.|**************ǁ"],
+			["ǁ*************|.|**************ǁ"],
 			["+==============X===============+"]]
-	farmData = {"name": "FARM", "42": "TOWN", "329": "POTION", "429": "POTION"}
+	farmData = {"name": "FARMS", "1215": "TOWN"}
 	farmSpawn = [[1, 15], [12,15]]
 	currentMap = town
 	currentMapData = townData
 	currentMapSpawn = townSpawn
 
-def findPos(yCoord, xCoord):
-	i = 0
-	while i < len(Maps.currentMap):
-		for position, char in enumerate(Maps.currentMap[i][0]):
-			if char == '@':
-				xCoord = position
-				yCoord = i
-		i += 1
-	print(yCoord, xCoord)
-
-def loadNextMap(spawnLocation, yCoord, xCoord):
+def loadNextMap(yCoord, xCoord, spawnLocation):
 	z = str(str(yCoord) + str(xCoord))
 	if Maps.currentMapData[z] == "TOWN":
 		Maps.currentMap = Maps.town
@@ -86,11 +76,12 @@ def loadNextMap(spawnLocation, yCoord, xCoord):
 		Maps.currentMap = Maps.neighbour_home
 		Maps.currentMapData = Maps.neighbour_homeData
 		Maps.currentMapSpawn = Maps.neighbour_homeSpawn
-	elif Maps.currentMapData[z] == "FARM":
+	elif Maps.currentMapData[z] == "FARMS":
 		Maps.currentMap = Maps.farm
 		Maps.currentMapData = Maps.farmData
 		Maps.currentMapSpawn = Maps.farmSpawn
-	return spawnLocation
+	yCoord, xCoord = respawnPlayer(spawnLocation)
+	return yCoord, xCoord
 
 def detectCollision(yCoord, xCoord):
 	try:
@@ -107,7 +98,6 @@ def detectCollision(yCoord, xCoord):
 			except ValueError:
 				return False
 
-
 def currentPosition(self, yCoord, xCoord):
 	previousPosition = Maps.currentMap[yCoord][0][xCoord]
 	self.addstr(yCoord, xCoord, previousPosition)
@@ -117,19 +107,23 @@ def movePlayer(self, yCoord, xCoord):
 	self.addstr(yCoord, xCoord, "@")
 	self.refresh()
 
-def respawnData(spawnLocation):
+def respawnData(yCoord, xCoord, spawnLocation):
 	if Maps.currentMapData["name"] == "TOWN":
-		spawnLocation = 0
+		if yCoord == 1 and xCoord == 15:  # FARM
+			spawnLocation = 1
+		elif yCoord == 5 and xCoord == 19:  # NEIGHBOUR
+			spawnLocation = 0
+		elif yCoord == 11 and xCoord == 19:  # HOME
+			spawnLocation = 0
 	elif Maps.currentMapData["name"] == "HOME":
-		spawnLocation = 2
+		spawnLocation = 2  # TOWN
 	elif Maps.currentMapData["name"] == "NEIGHBOURS_HOME":
-		spawnLocation = 1
-	elif Maps.currentMapData["name"] == "FARM":
-		spawnLocation = 1
+		spawnLocation = 1  # TOWN
+	elif Maps.currentMapData["name"] == "FARMS":
+		spawnLocation = 0
 	return spawnLocation
 
 def respawnPlayer(spawnLocation):
 	y = Maps.currentMapSpawn[spawnLocation][0]
 	x = Maps.currentMapSpawn[spawnLocation][1]
-	spawnLocation = respawnData(spawnLocation)
-	return y, x, spawnLocation
+	return y, x
