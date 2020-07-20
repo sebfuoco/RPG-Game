@@ -24,55 +24,106 @@ def buyItem(self, number, player, z):
 	except IndexError:
 		pass
 
+def searchInventory(player, target):
+	z = 0
+	if target != Equipment.Empty:
+		for x in player.Inventory:
+			# print(x[0], player.equipped["CHEST"])
+			if x[0] == target:
+				# print(player.Inventory[z][1])
+				player.Inventory[z][1] += 1
+				break
+			z += 1
+			if z == len(player.Inventory):
+				player.Inventory.append([target, 1])
+				break
+
+def use(self, player, temp, i, target):
+	if player.stats[target] == player.currentStats["Max" + target]:  # compare HP/MP to MaxHP/MaxMP
+		self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
+	else:
+		player.stats[target] += temp[0][i][0]["heal"]
+		temp[0][i][1] -= 1
+	if player.stats[target] > player.currentStats["Max" + target]:
+		player.stats[target] = player.currentStats["Max" + target]
+	return temp
+
 def useItem(self, player, temp, i):
 	try:
 		if temp[0][i][0]["name"] == "HEALTH-POTION":
-			if player.stats["HP"] == player.currentStats["MaxHP"]:
-				self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
-			else:
-				player.stats["HP"] += temp[0][i][0]["heal"]
-				temp[0][i][1] -= 1
+			temp = use(self, player, temp, i, "HP")
 		elif temp[0][i][0]["name"] == "MANA-POTION":
-			if player.stats["MP"] == player.currentStats["MaxMP"]:
-				self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
-			else:
-				player.stats["MP"] += temp[0][i][0]["heal"]
-				temp[0][i][1] -= 1
+			temp = use(self, player, temp, i, "MP")
 		elif isinstance(temp[0][i][0]["heal"], str):
 			if player.status == "POISONED":
 				player.status = "NORMAL"
 				temp[0][i][1] -= 1
 			else:
 				self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
-		if player.stats["HP"] > player.currentStats["MaxHP"]:
-			player.stats["HP"] = player.currentStats["MaxHP"]
-		elif player.stats["MP"] > player.currentStats["MaxMP"]:
-			player.stats["MP"] = player.currentStats["MaxMP"]
 		mainUI.characterUI(self, player)
 		self.refresh()
-		return temp
+		return temp, i
 	except IndexError:
 		pass
 
-def equipItem(self, player, temp, i):
-	print(temp[0][i][0])
-
-	if temp[0][i][0]["equipLocation"] == "HEAD":
-		player.equipped["HEAD"] = temp[0][i][0]
-	elif temp[0][i][0]["equipLocation"] == "CHEST":
-		player.equipped["CHEST"] = temp[0][i][0]
+def equip(self, player, temp, i, target):
+	if player.equipped[target] != temp[0][i][0]:
+		searchInventory(player, player.equipped[target])
 		temp[0][i][1] -= 1
-	elif temp[0][i][0]["equipLocation"] == "HAND":
-		player.equipped["RIGHT-HAND"] = temp[0][i][0]
-
-	mainUI.charInventoryUI(self, player)
-	self.refresh()
+		player.equipped[target] = temp[0][i][0]
+		EquipmentStats(player)
+	else:
+		self.addstr(12, 35, f"{temp[0][i][0]['name']} ALREADY EQUIPPED")
 	return temp
 
-def deleteItem(player, item):
-	i = 0
-	for x in item:
-		if x[0][1] == 0:
-			del x[0]
-			del player.Inventory[i]
-		i += 1
+def equipItem(self, player, temp, i, choice):
+	try:
+		if temp[0][i][0]["equipLocation"] == "HEAD":
+			temp = equip(self, player, temp, i, "HEAD")
+		elif temp[0][i][0]["equipLocation"] == "CHEST":
+			temp = equip(self, player, temp, i, "CHEST")
+		elif temp[0][i][0]["equipLocation"] == "HAND":
+			if choice == "RIGHT":
+				temp = equip(self, player, temp, i, "RIGHT-HAND")
+			elif choice == "LEFT":
+				temp = equip(self, player, temp, i, "LEFT-HAND")
+		mainUI.charInventoryUI(self, player)
+		self.refresh()
+		return temp, i
+	except IndexError:
+		pass
+
+def deleteItem(temp, player, i):
+	y = 0
+	if temp[0][i][1] == 0:
+		temp[0][i][1] += 1
+		for x in player.Inventory:
+			if x == temp[0][i]:
+				del player.Inventory[y]
+				break
+			y += 1
+	elif temp[0][i][1] >= 1:
+		z = 0
+		#print(temp[0][i][0], temp[0][i][1])
+		#print(x[i][0], x[i][1])
+		while True:
+			if player.Inventory[z][0]["name"] == temp[0][i][0]["name"]:
+				#print(player.Inventory[i])
+				#print(player.Inventory[z], temp[0][i])
+				player.Inventory[z][1] = temp[0][i][1]
+				#print(player.Inventory[z], temp[0][i])
+				break
+			z += 1
+
+def EquipmentStats(player):
+	strength = 0
+	defense = 0
+	for key, value in player.equipped.items():
+		print(key, ": STR: ", value["STR"])
+		strength += value["STR"]
+		defense += value["DEF"]
+		print(key, ": DEF: ", value["DEF"])
+
+	player.currentStats["MaxSTR"] = player.stats["STR"] + strength
+	player.currentStats["MaxDEF"] = player.stats["DEF"] + defense
+

@@ -25,18 +25,18 @@ class Classes:
 					"RIGHT-HAND": Equipment.WoodenSword}
 
 class Player(object):
-	def __init__(self, stats, nextLevel, equipped):
+	def __init__(self, startingStats, nextLevel, equipped):
 		XP = 20
-		self.currentStats = {"LEVEL": 1, "MaxHP": stats["HP"], "MaxMP": stats["MP"]}
-		self.stats = {"CLASS": stats["CLASS"], "HP": 11, "MP": stats["MP"], "STR": stats["STR"],
-					  "DEF": stats["DEF"]}
+		self.currentStats = {"LEVEL": 1, "MaxHP": startingStats["HP"], "MaxMP": startingStats["MP"], "MaxSTR": startingStats["STR"], "MaxDEF": startingStats["DEF"]}
+		self.stats = {"CLASS": startingStats["CLASS"], "HP": 1, "MP": startingStats["MP"], "STR": startingStats["STR"],
+					  "DEF": startingStats["DEF"]}
 		self.nextLevel = {"HPIncrease": nextLevel["HPIncrease"], "MPIncrease": nextLevel["MPIncrease"],
 						  "STRIncrease": nextLevel["STRIncrease"]}
 		self.equipped = {"HEAD": equipped["HEAD"], "CHEST": equipped["CHEST"], "LEFT-HAND": equipped["LEFT-HAND"],
 						 "RIGHT-HAND": equipped["RIGHT-HAND"]}
-		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1]]
+		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1], [Equipment.Knife, 10], [Equipment.WoodenSword, 11]]
 		self.Gold = 20
-		self.status = "NORMAL"
+		self.status = "POISONED"
 
 class mob(object):
 	def __init__(self, stats):
@@ -69,7 +69,6 @@ def main(main):
 	xCoord = 10
 	size = True
 	spawnLocation = 0
-	# print(Equipment.Empty)
 	screen = curses.initscr()
 	curses.start_color()
 	curses.use_default_colors()
@@ -103,6 +102,7 @@ def main(main):
 			screen.addstr(0, 0, "Not an option")
 			screen.refresh()
 			curses.napms(500)
+	EquipmentStats(player)
 	screen.clear()
 	size = mainUI.worldUI(screen, player)
 	movePlayer(screen, yCoord, xCoord)
@@ -194,39 +194,53 @@ def main(main):
 				print("USE")
 				print("EQUIP")
 			elif command == "USE":
-				item = [player.Inventory for x in player.Inventory]
 				temp = []
-				i = 0
-				for x in item:
-					if x[i][0]["type"] == "ITEM":
-						temp.append([x[i][0], x[i][1]])
-					i += 1
+				for x in player.Inventory:
+					if x[0]["type"] == "ITEM":
+						temp.append([x[0], x[1]])
 				temp = [temp for x in temp]
-				mainUI.inventory(screen, temp)
-				answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 8).decode("utf-8")) - 1
-				mainUI.logUI(screen)
-				mainUI.clearOptionalUI(screen)
-				temp = useItem(screen, player, temp, answer)
-				deleteItem(player, temp)
+				if temp:
+					mainUI.inventory(screen, temp)
+					answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
+					mainUI.logUI(screen)
+					mainUI.clearOptionalUI(screen)
+					temp, i = useItem(screen, player, temp, answer)
+					deleteItem(temp, player, i)
+				else:
+					screen.addstr(12, 35, f"NOTHING TO USE")
+					screen.refresh()
 				curses.napms(1000)
 				mainUI.logUI(screen)
+				mainUI.clearOptionalUI(screen)
 			elif command == "EQUIP":
-				item = [player.Inventory for x in player.Inventory]
 				temp = []
-				i = 0
-				for x in item:
-					if x[i][0]["type"] != "ITEM":
-						temp.append([x[i][0], x[i][1]])
-					i += 1
+				for x in player.Inventory:
+					if x[0]["type"] != "ITEM":
+						temp.append([x[0], x[1]])
 				temp = [temp for x in temp]
-				mainUI.inventory(screen, temp)
-				answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 8).decode("utf-8")) - 1
-				mainUI.logUI(screen)
-				mainUI.clearOptionalUI(screen)
-				temp = equipItem(screen, player, temp, answer)
-				deleteItem(player, temp)
+				if temp:
+					mainUI.inventory(screen, temp)
+					answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
+					mainUI.logUI(screen)
+					mainUI.clearOptionalUI(screen)
+					try:
+						if temp[0][answer][0]["equipLocation"] == "HAND":
+							choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
+						else:
+							choice = temp[0][answer][0]["equipLocation"]
+						mainUI.logUI(screen)
+						mainUI.clearOptionalUI(screen)
+						temp, i = equipItem(screen, player, temp, answer, choice)
+						deleteItem(temp, player, i)
+					except IndexError:
+						mainUI.logUI(screen)
+						mainUI.clearOptionalUI(screen)
+				else:
+					screen.addstr(12, 35, f"NOTHING TO EQUIP")
+					screen.refresh()
 				curses.napms(1000)
 				mainUI.logUI(screen)
+				mainUI.clearOptionalUI(screen)
 		screen.refresh()
 	curses.endwin()
 

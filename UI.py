@@ -44,7 +44,7 @@ class mainUI:
 			i = 4
 			pos = 33
 			loopUI(i, pos, charInv, self)
-			self.addstr(5, 35, f"STR: {str(player.stats['STR'])} DEF: {str(player.stats['DEF'])}     GOLD: {str(player.Gold)}", curses.A_BLINK)
+			self.addstr(5, 35, f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}     GOLD: {str(player.Gold)}", curses.A_BLINK)
 			self.addstr(6, 35, "HEAD: " + player.equipped["HEAD"]["name"])
 			self.addstr(7, 35, "CHEST: " + player.equipped["CHEST"]["name"])
 			self.addstr(8, 35, "LEFT-HAND: " + player.equipped["LEFT-HAND"]["name"])
@@ -176,6 +176,7 @@ class mainUI:
 		i = 0
 		pos = 65
 		loopUI(i, pos, empty, self)
+		self.refresh()
 
 def loopMap(item, screen):
 	try:
