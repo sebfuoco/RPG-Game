@@ -1,51 +1,8 @@
 from curses import wrapper
 from UI import *
 from ItemsAction import *
-
-class Classes:
-	# Warrior Stats + Factors
-	class Warrior:
-		stats = {"CLASS": "WARRIOR", "HP": 20, "MP": 0, "STR": 5, "DEF": 1}
-		nextLevel = {"HPIncrease": 5, "MPIncrease": 0, "STRIncrease": 1}
-		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
-					"RIGHT-HAND": Equipment.WoodenSword}
-
-	# Mage Stats + Factors
-	class Mage:
-		stats = {"CLASS": "MAGE", "HP": 20, "MP": 20, "STR": 1, "DEF": 0}
-		nextLevel = {"HPIncrease": 2, "MPIncrease": 5, "STRIncrease": 1}
-		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
-					"RIGHT-HAND": Equipment.WoodenWand}
-
-	# Thief Stats + Factors
-	class Thief:
-		stats = {"CLASS": "THIEF", "HP": 20, "MP": 0, "STR": 3, "DEF": 0}
-		nextLevel = {"HPIncrease": 3, "MPIncrease": 0, "STRIncrease": 1}
-		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
-					"RIGHT-HAND": Equipment.WoodenSword}
-
-class Player(object):
-	def __init__(self, startingStats, nextLevel, equipped):
-		XP = 20
-		self.currentStats = {"LEVEL": 1, "MaxHP": startingStats["HP"], "MaxMP": startingStats["MP"], "MaxSTR": startingStats["STR"], "MaxDEF": startingStats["DEF"]}
-		self.stats = {"CLASS": startingStats["CLASS"], "HP": 1, "MP": startingStats["MP"], "STR": startingStats["STR"],
-					  "DEF": startingStats["DEF"]}
-		self.nextLevel = {"HPIncrease": nextLevel["HPIncrease"], "MPIncrease": nextLevel["MPIncrease"],
-						  "STRIncrease": nextLevel["STRIncrease"]}
-		self.equipped = {"HEAD": equipped["HEAD"], "CHEST": equipped["CHEST"], "LEFT-HAND": equipped["LEFT-HAND"],
-						 "RIGHT-HAND": equipped["RIGHT-HAND"]}
-		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1], [Equipment.Knife, 10], [Equipment.WoodenSword, 11]]
-		self.Gold = 20
-		self.status = "POISONED"
-
-class mob(object):
-	def __init__(self, stats):
-		self.stats = {"name": stats["name"], "HP": stats["HP"], "STR": stats["STR"], "DEF": stats["DEF"],
-					  "XP": stats["XP"]}
-
-class mobList:
-	goblin = mob({"name": "GOBLIN", "HP": 10, "STR": 2, "DEF": 1, "XP": 5})
-	rat = mob({"name": "RAT", "HP": 8, "STR": 4, "DEF": 0, "XP": 8})
+from player import Classes, Player
+from mobs import attack, currentMobLocation
 
 def my_raw_input(screen, r, c, prompt_string, charlength):
 	curses.echo()
@@ -62,7 +19,57 @@ def loadMap(self, yCoord, xCoord, spawnLocation, player):
 	yCoord, xCoord = loadNextMap(yCoord, xCoord, spawnLocation)
 	self.clear()
 	size = mainUI.worldUI(self, player)
+	mobMap(self)
+	chestMap(self)
 	return yCoord, xCoord, spawnLocation, size
+
+def move(self, direction, yCoord, xCoord, spawnLocation, player):
+	originalCoord = {"yCoord": yCoord, "xCoord": xCoord}
+	if direction == "UP":
+		yCoord -= 1
+	elif direction == "DOWN":
+		yCoord += 1
+	elif direction == "LEFT":
+		xCoord -= 1
+	elif direction == "RIGHT":
+		xCoord += 1
+	else:
+		x = False
+	x = detectCollision(self, yCoord, xCoord)
+	if x:
+		if x == "loadMap":
+			yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation, player)
+			yCoord, xCoord = movePlayer(self, yCoord, xCoord)
+		elif x == "Merchant":
+			mainUI.merchantUI(self, yCoord, xCoord)
+			z = str(str(yCoord) + str(xCoord))
+			number = int(my_raw_input(self, 6, 66, "What will you buy?", 1).decode("utf-8")) - 1
+			buyItem(self, number, player, z)
+			yCoord, xCoord = movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+		elif x == "Chest":
+			mainUI.chestUI(self, yCoord, xCoord, player)
+			yCoord, xCoord = movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+		elif x == "Quest":
+			mainUI.questUI(self, yCoord, xCoord)
+			yCoord, xCoord = movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+		elif x == "Attack":
+			kill, yMob, xMob = attack(self, player, yCoord, xCoord)
+			yCoord, xCoord = movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+			if kill:
+				mobKill(kill, yMob, xMob)
+				mainUI.charInventoryUI(self, player)
+			mainUI.characterUI(self, player)
+			self.refresh()
+		else:
+			mainUI.clearOptionalUI(self)
+			currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"])
+			yCoord, xCoord = movePlayer(self, yCoord, xCoord)
+			if player.status == "POISONED":
+				player.stats["HP"] -= 1
+				mainUI.characterUI(self, player)
+	else:
+		return originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation
+	return yCoord, xCoord, spawnLocation
 
 def main(main):
 	yCoord = 11
@@ -89,13 +96,13 @@ def main(main):
 		choice = my_raw_input(screen, 3, 0, "Type in a number below:", 1).decode("utf-8")
 		screen.refresh()
 		if choice == "1":
-			player = Player(Classes.Warrior.stats, Classes.Warrior.nextLevel, Classes.Warrior.equipped)
+			player = Player("WARRIOR", Classes.Warrior.stats, Classes.Warrior.nextLevel, Classes.Warrior.equipped)
 			break
 		elif choice == "2":
-			player = Player(Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
+			player = Player("THIEF", Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
 			break
 		elif choice == "3":
-			player = Player(Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
+			player = Player("MAGE", Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
 			break
 		else:
 			screen.clear()
@@ -107,86 +114,38 @@ def main(main):
 	size = mainUI.worldUI(screen, player)
 	movePlayer(screen, yCoord, xCoord)
 	curses.noecho()
-	curses.curs_set(0)
+	screen.move(12, 35)
+	screen.refresh()
 	# findPos(yCoord, xCoord)
 	# choice = my_raw_input(screen, 12, 35, "Action?", 10).upper().decode("utf-8")
 	while size:
+		curses.curs_set(0)
+		if player.stats["HP"] <= 0:
+			mainUI.logUI(screen)
+			screen.refresh()
+			screen.addstr(12, 35, f"YOU DIED")
+			screen.refresh()
+			curses.napms(2000)
+			break
 		key = screen.getch()
+		mainUI.logUI(screen)
 		if key == curses.KEY_HOME:
 			break
 		# MOVEMENT
 		elif key == curses.KEY_UP:
-			x = detectCollision(yCoord - 1, xCoord)
-			if x:
-				if x == "loadMap":
-					yCoord, xCoord, spawnLocation, size = loadMap(screen, yCoord, xCoord, spawnLocation, player)
-				elif x == "Merchant":
-					mainUI.merchantUI(screen, yCoord - 1, xCoord)
-					z = str(str(yCoord - 1) + str(xCoord))
-					number = int(my_raw_input(screen, 6, 66, "What will you buy?", 1).decode("utf-8")) - 1
-					buyItem(screen, number, player, z)
-				elif x == "Chest":
-					mainUI.chestUI(screen, yCoord - 1, xCoord, player)
-				elif x == "Quest":
-					mainUI.questUI(screen, yCoord - 1, xCoord)
-				else:
-					mainUI.clearOptionalUI(screen)
-					currentPosition(screen, yCoord, xCoord)
-					yCoord -= 1
-				movePlayer(screen, yCoord, xCoord)
+			yCoord, xCoord, spawnLocation = move(screen, "UP", yCoord, xCoord, spawnLocation, player)
 		elif key == curses.KEY_DOWN:
-			x = detectCollision(yCoord + 1, xCoord)
-			if x:
-				if x == "loadMap":
-					yCoord, xCoord, spawnLocation, size = loadMap(screen, yCoord, xCoord, spawnLocation, player)
-				elif x == "Merchant":
-					mainUI.merchantUI(screen, yCoord + 1, xCoord)
-				elif x == "Chest":
-					mainUI.chestUI(screen, yCoord + 1, xCoord, player)
-				elif x == "Quest":
-					mainUI.questUI(screen, yCoord + 1, xCoord)
-				else:
-					mainUI.clearOptionalUI(screen)
-					currentPosition(screen, yCoord, xCoord)
-					yCoord += 1
-				movePlayer(screen, yCoord, xCoord)
+			yCoord, xCoord, spawnLocation = move(screen, "DOWN", yCoord, xCoord, spawnLocation, player)
 		elif key == curses.KEY_LEFT:
-			x = detectCollision(yCoord, xCoord - 1)
-			if x:
-				if x == "loadMap":
-					yCoord, xCoord, spawnLocation, size = loadMap(screen, yCoord, xCoord, spawnLocation, player)
-				elif x == "Merchant":
-					mainUI.merchantUI(screen, yCoord, xCoord - 1)
-				elif x == "Chest":
-					mainUI.chestUI(screen, yCoord, xCoord - 1, player)
-				elif x == "Quest":
-					mainUI.questUI(screen, yCoord, xCoord - 1)
-				else:
-					mainUI.clearOptionalUI(screen)
-					currentPosition(screen, yCoord, xCoord)
-					xCoord -= 1
-				movePlayer(screen, yCoord, xCoord)
+			yCoord, xCoord, spawnLocation = move(screen, "LEFT", yCoord, xCoord, spawnLocation, player)
 		elif key == curses.KEY_RIGHT:
-			x = detectCollision(yCoord, xCoord + 1)
-			if x:
-				if x == "loadMap":
-					yCoord, xCoord, spawnLocation, size = loadMap(screen, yCoord, xCoord, spawnLocation, player)
-				elif x == "Merchant":
-					mainUI.merchantUI(screen, yCoord, xCoord + 1)
-				elif x == "Chest":
-					mainUI.chestUI(screen, yCoord, xCoord + 1, player)
-				elif x == "Quest":
-					mainUI.questUI(screen, yCoord, xCoord + 1)
-				else:
-					mainUI.clearOptionalUI(screen)
-					currentPosition(screen, yCoord, xCoord)
-					xCoord += 1
-				movePlayer(screen, yCoord, xCoord)
+			yCoord, xCoord, spawnLocation = move(screen, "RIGHT", yCoord, xCoord, spawnLocation, player)
 		elif key in [105, 73]:  # "i" pressed
 			mainUI.clearOptionalUI(screen)
 			item = [player.Inventory for x in player.Inventory]
 			mainUI.inventory(screen, item)
 		elif key in [99, 67]:  # "c" pressed
+			curses.curs_set(1)
 			mainUI.clearOptionalUI(screen)
 			command = my_raw_input(screen, 12, 35, "WHAT WOULD YOU LIKE TO DO?", 8).decode("utf-8").upper()
 			mainUI.logUI(screen)
@@ -201,15 +160,18 @@ def main(main):
 				temp = [temp for x in temp]
 				if temp:
 					mainUI.inventory(screen, temp)
-					answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
-					mainUI.logUI(screen)
-					mainUI.clearOptionalUI(screen)
-					temp, i = useItem(screen, player, temp, answer)
-					deleteItem(temp, player, i)
+					try:
+						answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
+						mainUI.logUI(screen)
+						mainUI.clearOptionalUI(screen)
+						temp, i = useItem(screen, player, temp, answer)
+						deleteItem(temp, player, i)
+					except ValueError:
+						pass
 				else:
 					screen.addstr(12, 35, f"NOTHING TO USE")
 					screen.refresh()
-				curses.napms(1000)
+					curses.napms(1000)
 				mainUI.logUI(screen)
 				mainUI.clearOptionalUI(screen)
 			elif command == "EQUIP":
@@ -220,27 +182,34 @@ def main(main):
 				temp = [temp for x in temp]
 				if temp:
 					mainUI.inventory(screen, temp)
-					answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
-					mainUI.logUI(screen)
-					mainUI.clearOptionalUI(screen)
 					try:
-						if temp[0][answer][0]["equipLocation"] == "HAND":
-							choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
-						else:
-							choice = temp[0][answer][0]["equipLocation"]
+						answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
 						mainUI.logUI(screen)
 						mainUI.clearOptionalUI(screen)
-						temp, i = equipItem(screen, player, temp, answer, choice)
-						deleteItem(temp, player, i)
-					except IndexError:
-						mainUI.logUI(screen)
-						mainUI.clearOptionalUI(screen)
+						try:
+							if temp[0][answer][0]["equipLocation"] == "HAND":
+								choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
+							else:
+								choice = temp[0][answer][0]["equipLocation"]
+							mainUI.logUI(screen)
+							mainUI.clearOptionalUI(screen)
+							temp, i = equipItem(screen, player, temp, answer, choice)
+							deleteItem(temp, player, i)
+						except IndexError:
+							mainUI.logUI(screen)
+							mainUI.clearOptionalUI(screen)
+					except ValueError:
+						pass
 				else:
 					screen.addstr(12, 35, f"NOTHING TO EQUIP")
 					screen.refresh()
-				curses.napms(1000)
+					curses.napms(1000)
+				screen.refresh()
 				mainUI.logUI(screen)
 				mainUI.clearOptionalUI(screen)
+			elif command == "CHECK":
+				print(currentMobLocation.mobLocation)
+		screen.move(12, 35)
 		screen.refresh()
 	curses.endwin()
 

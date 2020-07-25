@@ -1,6 +1,8 @@
 import curses
+import mobs
 from Map import *
 from Items import *
+
 class mainUI:
 	def worldUI(self, player):
 		loopMap(Maps.currentMap, self)
@@ -23,9 +25,9 @@ class mainUI:
 			i = 0
 			pos = 33
 			loopUI(i, pos, quickCharacter, self)
-			self.addstr(1, 35, player.stats["CLASS"] + "          LEVEL: " + str(player.currentStats["LEVEL"]), curses.A_BLINK)
-			self.addstr(2, 39, str(player.stats["HP"]) + " / " + str(player.currentStats["MaxHP"]))
-			self.addstr(3, 39, str(player.stats["MP"]) + " / " + str(player.currentStats["MaxMP"]))
+			self.addstr(1, 35, f"{player.stats['CLASS']} LEVEL: {str(player.currentStats['LEVEL'])} | {player.status}", curses.A_BLINK)
+			self.addstr(2, 39, f"{str(player.stats['HP'])} / {str(player.currentStats['MaxHP'])}")
+			self.addstr(3, 39, f"{str(player.stats['MP'])} / {str(player.currentStats['MaxMP'])}")
 			size = True
 		except curses.error:
 			print("TERMINAL SIZE TOO SMALL, PLEASE RESIZE!")
@@ -45,10 +47,10 @@ class mainUI:
 			pos = 33
 			loopUI(i, pos, charInv, self)
 			self.addstr(5, 35, f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}     GOLD: {str(player.Gold)}", curses.A_BLINK)
-			self.addstr(6, 35, "HEAD: " + player.equipped["HEAD"]["name"])
-			self.addstr(7, 35, "CHEST: " + player.equipped["CHEST"]["name"])
-			self.addstr(8, 35, "LEFT-HAND: " + player.equipped["LEFT-HAND"]["name"])
-			self.addstr(9, 35, "RIGHT-HAND: " + player.equipped["RIGHT-HAND"]["name"])
+			self.addstr(6, 35, f"HEAD: {player.equipped['HEAD']['name']}")
+			self.addstr(7, 35, f"CHEST: {player.equipped['CHEST']['name']}")
+			self.addstr(8, 35, f"LEFT-HAND: {player.equipped['LEFT-HAND']['name']}")
+			self.addstr(9, 35, f"RIGHT-HAND: {player.equipped['RIGHT-HAND']['name']}")
 			size = True
 		except curses.error:
 			print("TERMINAL SIZE TOO SMALL, PLEASE RESIZE!")
@@ -142,7 +144,15 @@ class mainUI:
 		pos = 65
 		loopUI(i, pos, chest, self)
 		try:
-			self.addstr(i + 1, pos + 2, f"CHEST CONTAINS 1 {Maps.currentMapData[z]['name']}")
+			for key in Maps.currentMapChest:
+				x = 1
+				while x < len(Maps.currentMapChest[key]):
+					print(Maps.currentMapChest[key][x])
+					zChest = str(str(yCoord) + str(xCoord))
+					self.addstr(Maps.currentMapChest[key][x][0], Maps.currentMapChest[key][x][1], "C",
+								curses.color_pair(7))
+					x += 1
+			self.addstr(i + 1, pos + 2, f"CHEST CONTAINS 1 {Maps.currentMapChest['name']}")
 			item = [player.Inventory for x in player.Inventory]
 			for x in item:
 				if player.Inventory[i].count(Maps.currentMapData[z]):
@@ -170,7 +180,7 @@ class mainUI:
 			self.addstr(i + 1, pos + 2, f"CHEST CONTAINS 1 {Maps.currentMapData[z]['name']}")
 			Maps.currentMapData.pop(z, None)
 		except KeyError:
-			self.addstr(i + 1, pos + 2, "CHEST ALREADY OPENED")
+			self.addstr(i + 1, pos + 2, "QUEST COMPLETED")
 
 	def clearOptionalUI(self):
 		i = 0
@@ -191,14 +201,10 @@ def loopMap(item, screen):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(12))
 				elif item[col][0][row] in ("˄", "Q"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
-				elif item[col][0][row] in "C":
-					screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
 				elif item[col][0][row] in ("=", "ǁ", "+",".", "#", "▒"):  # Obstructions not coloured
 					screen.addstr(col, row, item[col][0][row])
-				else:
-					screen.addstr(col, row, item[col][0][row], curses.color_pair(5))
 				row += 1
 			row = 0
 			col += 1
@@ -206,6 +212,28 @@ def loopMap(item, screen):
 		print("TERMINAL SIZE TOO SMALL, PLEASE RESIZE!")
 		size = False
 		return size
+
+def mobMap(self):
+	try:
+		for key in Maps.currentMapMobs:
+			#print(key, Maps.currentMapMobs[key])
+			if key in mobs.mobIcons.mobs:  # MOBS
+				for item in Maps.currentMapMobs[key]:
+					#print(item)
+					self.addstr(item[0], item[1], key, curses.color_pair(5))
+					mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1]]]
+	except TypeError:
+		pass
+
+def chestMap(self):
+	try:
+		for key in Maps.currentMapChest:
+			x = 1
+			while x < len(Maps.currentMapChest[key]):
+				self.addstr(Maps.currentMapChest[key][x][0], Maps.currentMapChest[key][x][1], "C", curses.color_pair(7))
+				x += 1
+	except TypeError:
+		pass
 
 def loopUI(i, pos, item, screen):
 	for r in item:

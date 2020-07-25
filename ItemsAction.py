@@ -1,5 +1,6 @@
 from Items import *
 from UI import mainUI
+from curses import napms
 
 def buyItem(self, number, player, z):
 	#print(player.Inventory[0])
@@ -21,6 +22,8 @@ def buyItem(self, number, player, z):
 		else:
 			mainUI.clearOptionalUI(self)
 			self.addstr(0, 66, "NOT ENOUGH GOLD")
+			self.refresh()
+			napms(1000)
 	except IndexError:
 		pass
 
@@ -41,6 +44,8 @@ def searchInventory(player, target):
 def use(self, player, temp, i, target):
 	if player.stats[target] == player.currentStats["Max" + target]:  # compare HP/MP to MaxHP/MaxMP
 		self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
+		self.refresh()
+		napms(1000)
 	else:
 		player.stats[target] += temp[0][i][0]["heal"]
 		temp[0][i][1] -= 1
@@ -60,6 +65,8 @@ def useItem(self, player, temp, i):
 				temp[0][i][1] -= 1
 			else:
 				self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
+				self.refresh()
+				napms(1000)
 		mainUI.characterUI(self, player)
 		self.refresh()
 		return temp, i
@@ -74,21 +81,28 @@ def equip(self, player, temp, i, target):
 		EquipmentStats(player)
 	else:
 		self.addstr(12, 35, f"{temp[0][i][0]['name']} ALREADY EQUIPPED")
+		self.refresh()
+		napms(1000)
 	return temp
 
 def equipItem(self, player, temp, i, choice):
 	try:
-		if temp[0][i][0]["equipLocation"] == "HEAD":
-			temp = equip(self, player, temp, i, "HEAD")
-		elif temp[0][i][0]["equipLocation"] == "CHEST":
-			temp = equip(self, player, temp, i, "CHEST")
-		elif temp[0][i][0]["equipLocation"] == "HAND":
-			if choice == "RIGHT":
-				temp = equip(self, player, temp, i, "RIGHT-HAND")
-			elif choice == "LEFT":
-				temp = equip(self, player, temp, i, "LEFT-HAND")
-		mainUI.charInventoryUI(self, player)
-		self.refresh()
+		if player.stats["CLASS"] in temp[0][i][0]["equipClass"]:
+			if temp[0][i][0]["equipLocation"] == "HEAD":
+				temp = equip(self, player, temp, i, "HEAD")
+			elif temp[0][i][0]["equipLocation"] == "CHEST":
+				temp = equip(self, player, temp, i, "CHEST")
+			elif temp[0][i][0]["equipLocation"] == "HAND":
+				if choice == "RIGHT":
+					temp = equip(self, player, temp, i, "RIGHT-HAND")
+				elif choice == "LEFT":
+					temp = equip(self, player, temp, i, "LEFT-HAND")
+			mainUI.charInventoryUI(self, player)
+			self.refresh()
+		else:
+			self.addstr(12, 35, f"CANNOT EQUIP {temp[0][i][0]['name']}")
+			self.refresh()
+			napms(1000)
 		return temp, i
 	except IndexError:
 		pass
@@ -119,11 +133,8 @@ def EquipmentStats(player):
 	strength = 0
 	defense = 0
 	for key, value in player.equipped.items():
-		print(key, ": STR: ", value["STR"])
 		strength += value["STR"]
 		defense += value["DEF"]
-		print(key, ": DEF: ", value["DEF"])
 
 	player.currentStats["MaxSTR"] = player.stats["STR"] + strength
 	player.currentStats["MaxDEF"] = player.stats["DEF"] + defense
-
