@@ -179,11 +179,12 @@ def main(main):
 				for x in player.Inventory:
 					if x[0]["type"] != "ITEM":
 						temp.append([x[0], x[1]])
+				temp.append([Equipment.Empty, 1])
 				temp = [temp for x in temp]
 				if temp:
 					mainUI.inventory(screen, temp)
 					try:
-						answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
+						answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO EQUIP?", 1).decode("utf-8")) - 1
 						mainUI.logUI(screen)
 						mainUI.clearOptionalUI(screen)
 						try:
@@ -191,6 +192,16 @@ def main(main):
 								choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
 							else:
 								choice = temp[0][answer][0]["equipLocation"]
+							if temp[0][answer][0]["name"] == "EMPTY":
+								choice = my_raw_input(screen, 12, 35, "WHERE TO UNEQUIP?", 5).decode("utf-8").upper()
+								mainUI.logUI(screen)
+								mainUI.clearOptionalUI(screen)
+								if choice == "HAND":
+									choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
+									if choice == "RIGHT":
+										choice = "RIGHT-HAND"
+									elif choice == "LEFT":
+										choice = "LEFT-HAND"
 							mainUI.logUI(screen)
 							mainUI.clearOptionalUI(screen)
 							temp, i = equipItem(screen, player, temp, answer, choice)

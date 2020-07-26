@@ -87,22 +87,27 @@ def equip(self, player, temp, i, target):
 
 def equipItem(self, player, temp, i, choice):
 	try:
-		if player.stats["CLASS"] in temp[0][i][0]["equipClass"]:
-			if temp[0][i][0]["equipLocation"] == "HEAD":
-				temp = equip(self, player, temp, i, "HEAD")
-			elif temp[0][i][0]["equipLocation"] == "CHEST":
-				temp = equip(self, player, temp, i, "CHEST")
-			elif temp[0][i][0]["equipLocation"] == "HAND":
-				if choice == "RIGHT":
-					temp = equip(self, player, temp, i, "RIGHT-HAND")
-				elif choice == "LEFT":
-					temp = equip(self, player, temp, i, "LEFT-HAND")
+		if temp[0][i][0]["name"] == "EMPTY":
+			temp = equip(self, player, temp, i, choice)
 			mainUI.charInventoryUI(self, player)
 			self.refresh()
 		else:
-			self.addstr(12, 35, f"CANNOT EQUIP {temp[0][i][0]['name']}")
-			self.refresh()
-			napms(1000)
+			if player.stats["CLASS"] in temp[0][i][0]["equipClass"]:
+				if temp[0][i][0]["equipLocation"] == "HEAD":
+					temp = equip(self, player, temp, i, "HEAD")
+				elif temp[0][i][0]["equipLocation"] == "CHEST":
+					temp = equip(self, player, temp, i, "CHEST")
+				elif temp[0][i][0]["equipLocation"] == "HAND":
+					if choice == "RIGHT":
+						temp = equip(self, player, temp, i, "RIGHT-HAND")
+					elif choice == "LEFT":
+						temp = equip(self, player, temp, i, "LEFT-HAND")
+				mainUI.charInventoryUI(self, player)
+				self.refresh()
+			else:
+				self.addstr(12, 35, f"CANNOT EQUIP {temp[0][i][0]['name']}")
+				self.refresh()
+				napms(1000)
 		return temp, i
 	except IndexError:
 		pass

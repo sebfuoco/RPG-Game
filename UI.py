@@ -70,7 +70,7 @@ class mainUI:
 			i = 10
 			pos = 33
 			loopUI(i, pos, commands, self)
-			self.addstr(i + 1, pos + 2, "LOG", curses.A_BLINK)
+			self.addstr(i + 1, pos + 2, "LOG | PRESS C", curses.A_BLINK)
 			size = True
 		except curses.error:
 			print("TERMINAL SIZE TOO SMALL, PLEASE RESIZE!")
@@ -135,6 +135,15 @@ class mainUI:
 				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} HEAL: {str(j['heal'])} PRICE: {str(j['price'])}")
 			i += 1
 
+	def chestToInventory(self, newItem, key, x):
+		if Maps.currentMapData["name"] == "HOME":
+			self.addstr(newItem[x][0], newItem[x][1], ".")
+			print(Maps.homeChest)
+			del Maps.homeChest[key][x]
+			if len(Maps.homeChest[key]) == 1:
+				del Maps.homeChest[key]
+			print(Maps.homeChest)
+
 	def chestUI(self, yCoord, xCoord, player):
 		z = str(str(yCoord) + str(xCoord))
 		chest = [["+-------------------------------------+"],
@@ -143,28 +152,31 @@ class mainUI:
 		i = 0
 		pos = 65
 		loopUI(i, pos, chest, self)
+		newItem = ""
 		try:
 			for key in Maps.currentMapChest:
 				x = 1
+				j = 0
 				while x < len(Maps.currentMapChest[key]):
-					print(Maps.currentMapChest[key][x])
-					zChest = str(str(yCoord) + str(xCoord))
-					self.addstr(Maps.currentMapChest[key][x][0], Maps.currentMapChest[key][x][1], "C",
-								curses.color_pair(7))
+					zChest = str(str(Maps.currentMapChest[key][x][0]) + str(Maps.currentMapChest[key][x][1]))
+					if zChest == z:
+						self.addstr(i + 1, pos + 2, f"CHEST CONTAINS 1 {Maps.currentMapChest[key][x - 1]['name']}")
+						item = [player.Inventory for x in player.Inventory]
+						for y in item:
+							newItem = Maps.currentMapChest[key]
+							if player.Inventory[j].count(Maps.currentMapChest[key][0]) >= 1:
+								player.Inventory[j][1] += 1
+								mainUI.chestToInventory(self, newItem, key, x)
+								j = "IGNORE"
+								break
+							j += 1
+							if j != "IGNORE":
+								player.Inventory.append([newItem[0], 1])
+								mainUI.chestToInventory(self, newItem, key, x)
+								break
 					x += 1
-			self.addstr(i + 1, pos + 2, f"CHEST CONTAINS 1 {Maps.currentMapChest['name']}")
-			item = [player.Inventory for x in player.Inventory]
-			for x in item:
-				if player.Inventory[i].count(Maps.currentMapData[z]):
-					player.Inventory[i][1] += 1
-					i = "IGNORE"
-					break
-				i += 1
-			if i != "IGNORE":
-				player.Inventory.append([Maps.currentMapData[z], 1])
-			Maps.currentMapData.pop(z, None)
 		except KeyError:
-			self.addstr(i + 1, pos + 2, "CHEST ALREADY OPENED")
+			pass
 
 	def questUI(self, yCoord, xCoord):
 		z = str(str(yCoord) + str(xCoord))

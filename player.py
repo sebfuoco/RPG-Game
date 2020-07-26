@@ -3,19 +3,19 @@ from Items import Equipment, Items
 class Classes:
 	# Warrior Stats + Factors
 	class Warrior:
-		stats = {"CLASS": "WARRIOR", "HP": 20, "MP": 0, "STR": 5, "DEF": 1}
+		stats = {"CLASS": "WARRIOR", "HP": 20, "MP": 0, "STR": 3, "DEF": 1}
 		nextLevel = {"HPIncrease": 5, "MPIncrease": 0, "STRIncrease": 1}
 		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
 					"RIGHT-HAND": Equipment.WoodenSword}
 	# Mage Stats + Factors
 	class Mage:
-		stats = {"CLASS": "MAGE", "HP": 20, "MP": 20, "STR": 1, "DEF": 0}
+		stats = {"CLASS": "MAGE", "HP": 15, "MP": 20, "STR": 1, "DEF": 0}
 		nextLevel = {"HPIncrease": 2, "MPIncrease": 5, "STRIncrease": 1}
 		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
 					"RIGHT-HAND": Equipment.WoodenWand}
 	# Thief Stats + Factors
 	class Thief:
-		stats = {"CLASS": "THIEF", "HP": 20, "MP": 0, "STR": 3, "DEF": 0}
+		stats = {"CLASS": "THIEF", "HP": 18, "MP": 0, "STR": 2, "DEF": 0}
 		nextLevel = {"HPIncrease": 3, "MPIncrease": 0, "STRIncrease": 1}
 		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
 					"RIGHT-HAND": Equipment.WoodenSword}
