@@ -1,7 +1,7 @@
 class Equipment:
 	# Defense Equipment
 	# All Class Equipment
-	Empty = {"name": "EMPTY", "price": 0, "equipLocation": "ALL", "equipClass": ("WARRIOR", "THIEF", "MAGE"), "STR": 0, "DEF": 0}
+	Empty = {"name": "EMPTY", "type": "EQUIPMENT", "price": 0, "equipLocation": "ALL", "equipClass": ("WARRIOR", "THIEF", "MAGE"), "STR": 0, "DEF": 0}
 	Clothes = {"name": "CLOTHES", "type": "ARMOUR", "price": 1, "equipLocation": "CHEST", "equipClass": ("WARRIOR", "THIEF", "MAGE"), "STR": 0, "DEF": 1}
 	# Warrior Equipment
 	LeatherArmour = {"name": "LEATHER-ARMOUR", "type": "ARMOUR", "price": 10, "equipLocation": "CHEST", "equipClass": ("WARRIOR",),

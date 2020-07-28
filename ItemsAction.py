@@ -2,6 +2,24 @@ from Items import *
 from UI import mainUI
 from curses import napms
 
+def inventoryUse(target, player, addEmpty):
+	temp = []
+	for x in player.Inventory:
+		if x[0]["type"] in target:
+			temp.append([x[0], x[1]])
+	if addEmpty:
+		temp.append([Equipment.Empty, 1])
+	temp = [temp for x in temp]
+	return temp
+
+def sellItem(self, number, player):
+	if player.Inventory[number]:
+		player.Gold += player.Inventory[number][0]["price"]
+		player.Inventory[number][1] -= 1
+	if player.Inventory[number][1] == 0:
+		del player.Inventory[number]
+	mainUI.charInventoryUI(self, player)
+
 def buyItem(self, number, player, z):
 	#print(player.Inventory[0])
 	#print(townMerchant[z][number])

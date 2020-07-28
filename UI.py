@@ -3,6 +3,7 @@ import mobs
 from Map import *
 from Items import *
 
+
 class mainUI:
 	def worldUI(self, player):
 		loopMap(Maps.currentMap, self)
@@ -18,14 +19,15 @@ class mainUI:
 	def characterUI(self, player):
 		try:
 			quickCharacter = [["+-----------------------------+"],
-                              ["|                             |"],
-                              ["| HP:                         |"],
-                              ["| MP:                         |"],
-                              ["+-----------------------------+"]]
+							  ["|                             |"],
+							  ["| HP:                         |"],
+							  ["| MP:                         |"],
+							  ["+-----------------------------+"]]
 			i = 0
 			pos = 33
 			loopUI(i, pos, quickCharacter, self)
-			self.addstr(1, 35, f"{player.stats['CLASS']} LEVEL: {str(player.currentStats['LEVEL'])} | {player.status}", curses.A_BLINK)
+			self.addstr(1, 35, f"{player.stats['CLASS']} LEVEL: {str(player.currentStats['LEVEL'])} | {player.status}",
+						curses.A_BLINK)
 			self.addstr(2, 39, f"{str(player.stats['HP'])} / {str(player.currentStats['MaxHP'])}")
 			self.addstr(3, 39, f"{str(player.stats['MP'])} / {str(player.currentStats['MaxMP'])}")
 			size = True
@@ -37,16 +39,18 @@ class mainUI:
 	def charInventoryUI(self, player):
 		try:
 			charInv = [["+-----------------------------+"],
-                       ["|                             |"],
-                       ["|                             |"],
-                       ["|                             |"],
-                       ["|                             |"],
-                       ["|                             |"],
-                       ["+-----------------------------+"]]
+					   ["|                             |"],
+					   ["|                             |"],
+					   ["|                             |"],
+					   ["|                             |"],
+					   ["|                             |"],
+					   ["+-----------------------------+"]]
 			i = 4
 			pos = 33
 			loopUI(i, pos, charInv, self)
-			self.addstr(5, 35, f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}     GOLD: {str(player.Gold)}", curses.A_BLINK)
+			self.addstr(5, 35,
+						f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}     GOLD: {str(player.Gold)}",
+						curses.A_BLINK)
 			self.addstr(6, 35, f"HEAD: {player.equipped['HEAD']['name']}")
 			self.addstr(7, 35, f"CHEST: {player.equipped['CHEST']['name']}")
 			self.addstr(8, 35, f"LEFT-HAND: {player.equipped['LEFT-HAND']['name']}")
@@ -60,13 +64,13 @@ class mainUI:
 	def logUI(self):
 		try:
 			commands = [["+-----------------------------+"],
-                        ["|                             |"],
-                        ["|                             |"],
-                        ["|                             |"],
-                        ["|                             |"],
-                        ["|                             |"],
-                        ["|                             |"],
-                        ["+-----------------------------+"]]
+						["|                             |"],
+						["|                             |"],
+						["|                             |"],
+						["|                             |"],
+						["|                             |"],
+						["|                             |"],
+						["+-----------------------------+"]]
 			i = 10
 			pos = 33
 			loopUI(i, pos, commands, self)
@@ -78,14 +82,14 @@ class mainUI:
 		return size
 
 	def mapNameUI(self):
-		mapName =  [["+------------------------------+"],
-					["|                              |"],
-					["+------------------------------+"]]
+		mapName = [["+------------------------------+"],
+				   ["|                              |"],
+				   ["+------------------------------+"]]
 		i = 15
 		pos = 0
 		try:
 			loopUI(i, pos, mapName, self)
-			self.addstr(16, 2, Maps.currentMapData["name"])
+			self.addstr(16, 2, Maps.currentMapName)
 			size = True
 		except curses.error:
 			print("TERMINAL SIZE TOO SMALL, PLEASE RESIZE!")
@@ -94,33 +98,32 @@ class mainUI:
 
 	def inventory(self, item):
 		inventory = [["+------------------------------+"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["|                              |"],
-                    ["+------------------------------+"]]
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["|                              |"],
+					 ["+------------------------------+"]]
 		i = 0
 		pos = 65
 		loopUI(i, pos, inventory, self)
 		self.addstr(i + 1, pos + 2, "INVENTORY", curses.A_UNDERLINE)
-		#print(item)
 		for x in item:
 			self.addstr(i + 2, pos + 2, f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])}")
 			i += 1
 
 	def merchantUI(self, yCoord, xCoord):
 		merchant = [["+----------------------------------------+"],
-                    ["|                                        |"],
-                    ["|                                        |"],
-                    ["|                                        |"],
-                    ["|                                        |"],
-                    ["+----------------------------------------+"]]
+					["|                                        |"],
+					["|                                        |"],
+					["|                                        |"],
+					["|                                        |"],
+					["+----------------------------------------+"]]
 		i = 0
 		pos = 65
 		loopUI(i, pos, merchant, self)
@@ -128,7 +131,7 @@ class mainUI:
 		self.addstr(i + 1, pos + 2, "FOR SALE", curses.A_UNDERLINE)
 		for j in townMerchant[z]:
 			if j["type"] == "ARMOUR":
-				self.addstr(i + 2, pos + 2, f"{i+ 1}. {j['name']} DEF: {str(j['DEF'])} PRICE: {str(j['price'])}")
+				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} DEF: {str(j['DEF'])} PRICE: {str(j['price'])}")
 			elif j["type"] == "WEAPON":
 				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} STR: {str(j['STR'])} PRICE: {str(j['price'])}")
 			elif j["type"] == "ITEM":
@@ -136,7 +139,7 @@ class mainUI:
 			i += 1
 
 	def chestToInventory(self, newItem, key, x):
-		if Maps.currentMapData["name"] == "HOME":
+		if Maps.currentMapName == "HOME":
 			self.addstr(newItem[x][0], newItem[x][1], ".")
 			print(Maps.homeChest)
 			del Maps.homeChest[key][x]
@@ -152,7 +155,6 @@ class mainUI:
 		i = 0
 		pos = 65
 		loopUI(i, pos, chest, self)
-		newItem = ""
 		try:
 			for key in Maps.currentMapChest:
 				x = 1
@@ -189,7 +191,7 @@ class mainUI:
 		pos = 65
 		loopUI(i, pos, quest, self)
 		try:
-			self.addstr(i + 1, pos + 2, f"CHEST CONTAINS 1 {Maps.currentMapData[z]['name']}")
+			self.addstr(i + 1, pos + 2, f"QUEST ACTIVATED: {Maps.currentMapQuest[z]['name']}")
 			Maps.currentMapData.pop(z, None)
 		except KeyError:
 			self.addstr(i + 1, pos + 2, "QUEST COMPLETED")
@@ -215,7 +217,7 @@ def loopMap(item, screen):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
-				elif item[col][0][row] in ("=", "ǁ", "+",".", "#", "▒"):  # Obstructions not coloured
+				elif item[col][0][row] in ("=", "ǁ", "+", ".", "#", "▒"):  # Obstructions not coloured
 					screen.addstr(col, row, item[col][0][row])
 				row += 1
 			row = 0
@@ -227,15 +229,23 @@ def loopMap(item, screen):
 
 def mobMap(self):
 	try:
+		i = 0
+		mobs.currentMobLocation.mobLocation = []
 		for key in Maps.currentMapMobs:
-			#print(key, Maps.currentMapMobs[key])
+			# print(key, Maps.currentMapMobs[key])
 			if key in mobs.mobIcons.mobs:  # MOBS
 				for item in Maps.currentMapMobs[key]:
-					#print(item)
-					self.addstr(item[0], item[1], key, curses.color_pair(5))
-					mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1]]]
+					# print(item)
+					if Maps.currentMap[item[0]][0][item[1]] == ".":
+						mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1]]]
+						if mobs.currentMobLocation.mobLocation[i][0]["type"] == "BOSS":
+							self.addstr(item[0], item[1], key, curses.color_pair(6))
+						else:
+							self.addstr(item[0], item[1], key, curses.color_pair(5))
+					i += 1
 	except TypeError:
 		pass
+
 
 def chestMap(self):
 	try:
@@ -247,21 +257,23 @@ def chestMap(self):
 	except TypeError:
 		pass
 
+
 def loopUI(i, pos, item, screen):
 	for r in item:
 		for c in r:
 			screen.addstr(i, pos, c)
 			i += 1
 
+
 empty = [["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "],
-         ["                                          "]]
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "],
+		 ["                                          "]]

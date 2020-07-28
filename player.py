@@ -25,13 +25,13 @@ class Player(object):
 		self.currentStats = {"CLASS": startingClass, "LEVEL": 1, "MaxHP": startingStats["HP"],
 							 "MaxMP": startingStats["MP"], "MaxSTR": startingStats["STR"],
 							 "MaxDEF": startingStats["DEF"], "MaxXP": 20}
-		self.stats = {"CLASS": startingStats["CLASS"], "HP": 10, "MP": startingStats["MP"], "STR": startingStats["STR"],
+		self.stats = {"CLASS": startingStats["CLASS"], "HP": startingStats["HP"], "MP": startingStats["MP"], "STR": startingStats["STR"],
 					  "DEF": startingStats["DEF"], "XP": 0}
 		self.nextLevel = {"HPIncrease": nextLevel["HPIncrease"], "MPIncrease": nextLevel["MPIncrease"],
 						  "STRIncrease": nextLevel["STRIncrease"]}
 		self.equipped = {"HEAD": equipped["HEAD"], "CHEST": equipped["CHEST"], "LEFT-HAND": equipped["LEFT-HAND"],
 						 "RIGHT-HAND": equipped["RIGHT-HAND"]}
-		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1]]
+		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1], [Equipment.Knife, 1], [Equipment.LeatherArmour, 1]]
 		self.Gold = 20
 		self.status = "NORMAL"
 
