@@ -1,8 +1,7 @@
 import curses
 import mobs
-from Map import *
+from Map import Maps
 from Items import *
-
 
 class mainUI:
 	def worldUI(self, player):
@@ -137,15 +136,19 @@ class mainUI:
 			elif j["type"] == "ITEM":
 				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} HEAL: {str(j['heal'])} PRICE: {str(j['price'])}")
 			i += 1
+		return i
 
 	def chestToInventory(self, newItem, key, x):
-		if Maps.currentMapName == "HOME":
+		if Maps.currentMapName == Maps.mapNames.homeName:
 			self.addstr(newItem[x][0], newItem[x][1], ".")
-			print(Maps.homeChest)
 			del Maps.homeChest[key][x]
 			if len(Maps.homeChest[key]) == 1:
 				del Maps.homeChest[key]
-			print(Maps.homeChest)
+		elif Maps.currentMapName == Maps.mapNames.forestName:
+			self.addstr(newItem[x][0], newItem[x][1], ".")
+			del Maps.forestChest[key][x]
+			if len(Maps.forestChest[key]) == 1:
+				del Maps.forestChest[key]
 
 	def chestUI(self, yCoord, xCoord, player):
 		z = str(str(yCoord) + str(xCoord))
@@ -169,13 +172,11 @@ class mainUI:
 							if player.Inventory[j].count(Maps.currentMapChest[key][0]) >= 1:
 								player.Inventory[j][1] += 1
 								mainUI.chestToInventory(self, newItem, key, x)
-								j = "IGNORE"
 								break
 							j += 1
-							if j != "IGNORE":
+							if j == len(player.Inventory):
 								player.Inventory.append([newItem[0], 1])
 								mainUI.chestToInventory(self, newItem, key, x)
-								break
 					x += 1
 		except KeyError:
 			pass

@@ -83,6 +83,8 @@ class Maps:
 			  ["+==============X===============+"]]
 	forestData = {"1215": mapNames.farmName}
 	forestSpawn = [[1, 15], [12, 15]]
+	forestChest = {Items.HealthPotion['name']: [Items.HealthPotion, [9, 23]],
+				 Items.Antidote['name']: [Items.Antidote, [5, 11]]}
 	forestMobs = {"s": [[11, 3], [9, 14], [9, 7]], "q": [[1, 14]]}
 
 	currentMap = town
@@ -92,4 +94,3 @@ class Maps:
 	currentMapMobs = None
 	currentMapChest = None
 	currentMapQuest = None
-

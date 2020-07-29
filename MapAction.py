@@ -4,7 +4,7 @@ from mobs import mobIcons
 
 def loadNextMap(yCoord, xCoord, spawnLocation):
 	z = str(str(yCoord) + str(xCoord))
-	if Maps.currentMapData[z] == "TOWN":
+	if Maps.currentMapData[z] == Maps.mapNames.townName:
 		Maps.currentMapName = Maps.mapNames.townName
 		Maps.currentMap = Maps.town
 		Maps.currentMapData = Maps.townData
@@ -12,7 +12,7 @@ def loadNextMap(yCoord, xCoord, spawnLocation):
 		Maps.currentMapMobs = None
 		Maps.currentMapChest = None
 		Maps.currentMapQuest = None
-	elif Maps.currentMapData[z] == "HOME":
+	elif Maps.currentMapData[z] == Maps.mapNames.homeName:
 		Maps.currentMapName = Maps.mapNames.homeName
 		Maps.currentMap = Maps.home
 		Maps.currentMapData = Maps.homeData
@@ -20,7 +20,7 @@ def loadNextMap(yCoord, xCoord, spawnLocation):
 		Maps.currentMapMobs = None
 		Maps.currentMapChest = Maps.homeChest
 		Maps.currentMapQuest = None
-	elif Maps.currentMapData[z] == "NEIGHBOURS_HOME":
+	elif Maps.currentMapData[z] == Maps.mapNames.neighbour_homeName:
 		Maps.currentMapName = Maps.mapNames.neighbour_homeName
 		Maps.currentMap = Maps.neighbour_home
 		Maps.currentMapData = Maps.neighbour_homeData
@@ -28,7 +28,7 @@ def loadNextMap(yCoord, xCoord, spawnLocation):
 		Maps.currentMapMobs = None
 		Maps.currentMapChest = None
 		Maps.currentMapQuest = Maps.neighbour_homeQuest
-	elif Maps.currentMapData[z] == "FARMS":
+	elif Maps.currentMapData[z] == Maps.mapNames.farmName:
 		Maps.currentMapName = Maps.mapNames.farmName
 		Maps.currentMap = Maps.farm
 		Maps.currentMapData = Maps.farmData
@@ -36,13 +36,13 @@ def loadNextMap(yCoord, xCoord, spawnLocation):
 		Maps.currentMapMobs = Maps.farmMobs
 		Maps.currentMapChest = None
 		Maps.currentMapQuest = Maps.farmQuest
-	elif Maps.currentMapData[z] == "FOREST":
+	elif Maps.currentMapData[z] == Maps.mapNames.forestName:
 		Maps.currentMapName = Maps.mapNames.forestName
 		Maps.currentMap = Maps.forest
 		Maps.currentMapData = Maps.forestData
 		Maps.currentMapSpawn = Maps.forestSpawn
 		Maps.currentMapMobs = Maps.forestMobs
-		Maps.currentMapChest = None
+		Maps.currentMapChest = Maps.forestChest
 		Maps.currentMapQuest = None
 	yCoord, xCoord = respawnPlayer(spawnLocation)
 	return yCoord, xCoord
@@ -78,23 +78,23 @@ def movePlayer(self, yCoord, xCoord):
 	return yCoord, xCoord
 
 def respawnData(yCoord, xCoord, spawnLocation):
-	if Maps.currentMapName == "TOWN":
+	if Maps.currentMapName == Maps.mapNames.townName:
 		if yCoord == 1 and xCoord == 15:  # FARM
 			spawnLocation = 1
 		elif yCoord == 5 and xCoord == 19:  # NEIGHBOUR
 			spawnLocation = 0
 		elif yCoord == 11 and xCoord == 19:  # HOME
 			spawnLocation = 0
-	elif Maps.currentMapName == "HOME":
+	elif Maps.currentMapName == Maps.mapNames.homeName:
 		spawnLocation = 2  # TOWN
-	elif Maps.currentMapName == "NEIGHBOURS_HOME":
+	elif Maps.currentMapName == Maps.mapNames.neighbour_homeName:
 		spawnLocation = 1  # TOWN
-	elif Maps.currentMapName == "FARMS":
+	elif Maps.currentMapName == Maps.mapNames.farmName:
 		if yCoord == 1 and xCoord == 15:
 			spawnLocation = 1
 		elif yCoord == 12 and xCoord == 15:
 			spawnLocation = 0
-	elif Maps.currentMapName == "FOREST":
+	elif Maps.currentMapName == Maps.mapNames.forestName:
 		spawnLocation = 0
 	return spawnLocation
 
@@ -112,12 +112,12 @@ def mobKill(kill, yMob, xMob):
 			while i < len(item[1]):
 				z = str(str(item[1][i][0]) + str(item[1][i][1]))
 				if z == zMob:
-					if Maps.currentMapName == "FARMS":
+					if Maps.currentMapName == Maps.mapNames.farmName:
 						del Maps.farmMobs[kill][i]
 						if len(Maps.farmMobs[kill]) == 0:
 							del Maps.farmMobs[kill]
 						return
-					elif Maps.currentMapName == "FOREST":
+					elif Maps.currentMapName == Maps.mapNames.forestName:
 						del Maps.forestMobs[kill][i]
 						if len(Maps.forestMobs[kill]) == 0:
 							del Maps.forestMobs[kill]

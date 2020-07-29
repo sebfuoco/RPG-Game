@@ -12,30 +12,32 @@ def inventoryUse(target, player, addEmpty):
 	temp = [temp for x in temp]
 	return temp
 
-def sellItem(self, number, player):
+def sellItem(self, number, amount, player):
 	if player.Inventory[number]:
-		player.Gold += player.Inventory[number][0]["price"]
-		player.Inventory[number][1] -= 1
+		if (player.Inventory[number][1] - amount) >= 0:
+			player.Gold += (player.Inventory[number][0]["price"] * amount)
+			player.Inventory[number][1] -= amount
 	if player.Inventory[number][1] == 0:
 		del player.Inventory[number]
 	mainUI.charInventoryUI(self, player)
+	mainUI.logUI(self)
 
-def buyItem(self, number, player, z):
+def buyItem(self, number, amount, player, z):
 	#print(player.Inventory[0])
 	#print(townMerchant[z][number])
 	try:
-		if townMerchant[z][number]["price"] <= player.Gold:
+		if (townMerchant[z][number]["price"] * amount) <= player.Gold:
 			i = 0
 			item = [player.Inventory for x in player.Inventory]
 			for x in item:
 				if player.Inventory[i].count(townMerchant[z][number]):
-					player.Inventory[i][1] += 1
+					player.Inventory[i][1] += amount
 					i = "IGNORE"
 					break
 				i += 1
-			player.Gold -= townMerchant[z][number]["price"]
+			player.Gold -= (townMerchant[z][number]["price"] * amount)
 			if i != "IGNORE":
-				player.Inventory.append([townMerchant[z][number], 1])
+				player.Inventory.append([townMerchant[z][number], amount])
 			mainUI.charInventoryUI(self, player)
 		else:
 			mainUI.clearOptionalUI(self)
@@ -155,9 +157,17 @@ def deleteItem(temp, player, i):
 def EquipmentStats(player):
 	strength = 0
 	defense = 0
+	evasion = 0
+	speed = 0
 	for key, value in player.equipped.items():
 		strength += value["STR"]
 		defense += value["DEF"]
+		if value["type"] == "ARMOUR":
+			evasion += value["EVASION"]
+		if value["type"] == "ARMOUR":
+			speed += value["SPEED"]
 
 	player.currentStats["MaxSTR"] = player.stats["STR"] + strength
 	player.currentStats["MaxDEF"] = player.stats["DEF"] + defense
+	player.currentStats["MaxEVASION"] = player.stats["EVASION"] + evasion
+	player.currentStats["MaxSPEED"] = player.stats["SPEED"] + speed
