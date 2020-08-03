@@ -4,9 +4,10 @@ class Maps:
 	class mapNames:
 		townName = "TOWN"
 		homeName = "HOME"
-		neighbour_homeName = "NEIGHBOURS_HOME"
+		neighbour_homeName = "NEIGHBOURS HOME"
 		farmName = "FARMS"
 		forestName = "FOREST"
+		townSquareName = "TOWN SQUARE"
 
 	town = [["+==============X===============+"],
 			["ǁ..............................ǁ"],
@@ -48,7 +49,8 @@ class Maps:
                       ["+==============================+"]]
 	neighbour_homeData = {"42": mapNames.townName}
 	neighbour_homeSpawn = [[4, 2]]
-	neighbour_homeQuest = {"DELIVER MESSAGE": [4, 29]}
+	neighbour_homeQuest = {"429": ["DELIVER MESSAGE TO TOWN ELDER", f"HELLO YOUNG ONE, I AM TOO WEAK TO DELIVER THIS MESSAGE TO THE TOWN ELDER, CURRENTLY IN THE {mapNames.townSquareName}. "
+																	f"I WOULD BE DELIGHTED IF YOU SENT IT TO HIM.", [mapNames.townSquareName, [8, 16], {"GOLD": 10, "XP": 10, "REWARD": Items.SuperHealthPotion}]]}
 	farm = [["+==============X===============+"],
 			["ǁ*************▒..##############ǁ"],
 			["ǁ*************▒..#............#ǁ"],
@@ -65,7 +67,7 @@ class Maps:
 			["+==============X===============+"]]
 	farmData = {"1215": mapNames.townName, "115": mapNames.forestName}
 	farmSpawn = [[1, 15], [12, 15]]
-	farmMobs = {"g": [[2, 25], [3, 29], [4, 27], [5, 22]], "r": [[2, 23]]}
+	farmMobs = {"g": [[2, 25], [3, 29], [4, 27], [5, 22], [2, 23]]}
 	farmQuest = {"KILL MOBS": [4, 16]}
 	forest = [["+==============X===============+"],
 			  ["ǁ..............................ǁ"],
@@ -81,11 +83,28 @@ class Maps:
 			  ["ǁ**.*************..*****...**..ǁ"],
 			  ["ǁ**.............*..............ǁ"],
 			  ["+==============X===============+"]]
-	forestData = {"1215": mapNames.farmName}
+	forestData = {"1215": mapNames.farmName, "115": mapNames.townSquareName}
 	forestSpawn = [[1, 15], [12, 15]]
 	forestChest = {Items.HealthPotion['name']: [Items.HealthPotion, [9, 23]],
 				 Items.Antidote['name']: [Items.Antidote, [5, 11]]}
-	forestMobs = {"s": [[11, 3], [9, 14], [9, 7]], "q": [[1, 14]]}
+	forestMobs = {"s": [[11, 3], [9, 14], [9, 7], [9, 24]], "r": [[12, 5], [6, 18]], "q": [[1, 14]]}
+	townSquare = [["+==============X===============+"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ...........▒▒▒▒▒▒▒▒...........ǁ"],
+			  	  ["X...........▒▒▒..▒▒▒...........X"],
+			  	  ["ǁ...........▒▒▒▒I▒▒▒...........ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["ǁ..............................ǁ"],
+			  	  ["+==============X===============+"]]
+	townSquareData = {"1315": mapNames.forestName}
+	townSquareSpawn = [[1, 15], [13, 15], [7, 1], [7, 31]]
 
 	currentMap = town
 	currentMapName = mapNames.townName

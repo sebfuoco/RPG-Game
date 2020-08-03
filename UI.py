@@ -95,48 +95,44 @@ class mainUI:
 			size = False
 		return size
 
-	def inventory(self, item):
-		inventory = [["+------------------------------+"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["|                              |"],
-					 ["+------------------------------+"]]
+	def spells(self, item):
 		i = 0
 		pos = 65
-		loopUI(i, pos, inventory, self)
-		self.addstr(i + 1, pos + 2, "INVENTORY", curses.A_UNDERLINE)
+		spell = ""
 		for x in item:
-			self.addstr(i + 2, pos + 2, f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])}")
+			spell += f"{i + 1}. {x['name']}: {x['MANA']} MP "
+			if x != item[-1]:
+				spell += "tab "
 			i += 1
+		mainUI.wrapText(self, "SPELLS", spell, 1, 67, UI)
+
+	def inventory(self, item):
+		i = 0
+		inventoryItems = ""
+		for x in item:
+			inventoryItems += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])} "
+			if x[i] != item[0][-1]:
+				inventoryItems += "tab "
+			i += 1
+		mainUI.wrapText(self, "INVENTORY", inventoryItems, 1, 67, UI)
 
 	def merchantUI(self, yCoord, xCoord):
-		merchant = [["+----------------------------------------+"],
-					["|                                        |"],
-					["|                                        |"],
-					["|                                        |"],
-					["|                                        |"],
-					["+----------------------------------------+"]]
+		merchantItems = ""
 		i = 0
-		pos = 65
-		loopUI(i, pos, merchant, self)
 		z = str(str(yCoord) + str(xCoord))
-		self.addstr(i + 1, pos + 2, "FOR SALE", curses.A_UNDERLINE)
 		for j in townMerchant[z]:
-			if j["type"] == "ARMOUR":
-				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} DEF: {str(j['DEF'])} PRICE: {str(j['price'])}")
-			elif j["type"] == "WEAPON":
-				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} STR: {str(j['STR'])} PRICE: {str(j['price'])}")
-			elif j["type"] == "ITEM":
-				self.addstr(i + 2, pos + 2, f"{i + 1}. {j['name']} HEAL: {str(j['heal'])} PRICE: {str(j['price'])}")
 			i += 1
-		return i
+			if j["type"] == "ARMOUR":
+				merchantItems += f" {i}. {j['name']} DEF: {str(j['DEF'])} PRICE: {str(j['price'])} "
+			elif j["type"] == "WEAPON":
+				merchantItems += f"{i}. {j['name']} STR: {str(j['STR'])} PRICE: {str(j['price'])} "
+			elif j["type"] == "ITEM":
+				merchantItems += f"{i}. {j['name']} HEAL: {str(j['heal'])} PRICE: {str(j['price'])} "
+			if j != townMerchant[z][-1]:
+				merchantItems += "tab "
+		amount = i
+		mainUI.wrapText(self, "FOR SALE", merchantItems, 1, 67, UI)
+		return amount
 
 	def chestToInventory(self, newItem, key, x):
 		if Maps.currentMapName == Maps.mapNames.homeName:
@@ -181,21 +177,50 @@ class mainUI:
 		except KeyError:
 			pass
 
-	def questUI(self, yCoord, xCoord):
+	def wrapText(self, title, text, i, pos, mapUI):
+		maxPos = pos + 36
+		# TITLE
+		self.addstr(0, 65, mapUI[0][0])
+		self.addstr(i, 65, mapUI[1][0])
+		if len(title) + 2 <= maxPos:
+			self.addstr(i, pos, title, curses.A_UNDERLINE)
+		i += 1
+		self.addstr(i, 65, mapUI[1][0])
+		# TEXT
+		if (len(text) + pos + 2) <= maxPos:
+			text = text.replace("tab", "")
+			self.addstr(i, pos, text)
+		else:
+			output = text.split()
+			for word in output:
+				if (len(word) + pos) <= maxPos and "tab" not in word:
+					self.addstr(i, pos, word)
+					pos += len(word) + 1
+				else:
+					pos = 67
+					i += 1
+					self.addstr(i, 65, mapUI[1][0])
+					if word != "tab":
+						self.addstr(i, pos, word.lstrip())
+						pos += len(word) + 1
+		self.addstr(i + 1, 65, mapUI[0][0])
+
+	def questUI(self, player, yCoord, xCoord):
+		mainUI.clearOptionalUI(self)
 		z = str(str(yCoord) + str(xCoord))
-		quest = [["+-------------------------------------+"],
-				 ["|                                     |"],
-				 ["|                                     |"],
-				 ["|                                     |"],
-				 ["+-------------------------------------+"]]
-		i = 0
-		pos = 65
-		loopUI(i, pos, quest, self)
+		i = 1
+		pos = 67
 		try:
-			self.addstr(i + 1, pos + 2, f"QUEST ACTIVATED: {Maps.currentMapQuest[z]['name']}")
-			Maps.currentMapData.pop(z, None)
+			if Maps.currentMapQuest[z] in player.activeQuests:
+				self.addstr(i, pos, "QUEST IN PROGRESS")
+			else:
+				mainUI.wrapText(self, Maps.currentMapQuest[z][0], Maps.currentMapQuest[z][1], i, pos, UI)
+				player.activeQuests.append(Maps.currentMapQuest[z])
+			#Maps.currentMapQuest.pop(z)
 		except KeyError:
-			self.addstr(i + 1, pos + 2, "QUEST COMPLETED")
+			print(Maps.currentMapQuest)
+			if Maps.currentMapQuest[z] == "IN PROGRESS":
+				self.addstr(i, pos, "QUEST IN PROGRESS")
 
 	def clearOptionalUI(self):
 		i = 0
@@ -214,7 +239,7 @@ def loopMap(item, screen):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(11))
 				elif item[col][0][row] in "M":
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(12))
-				elif item[col][0][row] in ("˄", "Q"):
+				elif item[col][0][row] in ("˄", "Q", "I"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
@@ -233,10 +258,8 @@ def mobMap(self):
 		i = 0
 		mobs.currentMobLocation.mobLocation = []
 		for key in Maps.currentMapMobs:
-			# print(key, Maps.currentMapMobs[key])
 			if key in mobs.mobIcons.mobs:  # MOBS
 				for item in Maps.currentMapMobs[key]:
-					# print(item)
 					if Maps.currentMap[item[0]][0][item[1]] == ".":
 						mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1]]]
 						if mobs.currentMobLocation.mobLocation[i][0]["type"] == "BOSS":
@@ -246,7 +269,6 @@ def mobMap(self):
 					i += 1
 	except TypeError:
 		pass
-
 
 def chestMap(self):
 	try:
@@ -258,13 +280,11 @@ def chestMap(self):
 	except TypeError:
 		pass
 
-
 def loopUI(i, pos, item, screen):
 	for r in item:
 		for c in r:
 			screen.addstr(i, pos, c)
 			i += 1
-
 
 empty = [["                                          "],
 		 ["                                          "],
@@ -278,3 +298,6 @@ empty = [["                                          "],
 		 ["                                          "],
 		 ["                                          "],
 		 ["                                          "]]
+
+UI = [["+-------------------------------------+"],
+	  ["|                                     |"]]

@@ -4,7 +4,9 @@ class Magic:
 	Fire = {"name": "FIRE", "POWER": 5, "MANA": 5}
 	Ice = {"name": "ICE", "POWER": 5, "MANA": 5}
 	Thunder = {"name": "THUNDER", "POWER": 5, "MANA": 5}
-	selectedMagic = Fire
+	Heal = {"name": "HEAL", "POWER": 5, "MANA": 10}
+	spellBook = [Fire, Ice, Thunder]
+	selectedMagic = spellBook[0]
 
 class Classes:
 	# Warrior Stats + Factors
@@ -38,12 +40,14 @@ class Player(object):
 						  "STRIncrease": nextLevel["STRIncrease"], "MagicSTRIncrease": nextLevel["MagicSTRIncrease"], "SPEEDIncrease": nextLevel["SPEEDIncrease"]}
 		self.equipped = {"HEAD": equipped["HEAD"], "CHEST": equipped["CHEST"], "LEFT-HAND": equipped["LEFT-HAND"],
 						 "RIGHT-HAND": equipped["RIGHT-HAND"]}
-		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1], [Equipment.Knife, 1], [Equipment.LeatherArmour, 1]]
+		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1]]
 		self.Gold = 20
 		self.status = "NORMAL"
+		self.activeQuests = []
 
 	def levelUp(self, screen):
-		if self.stats["XP"] >= self.currentStats["MaxXP"]:
+		while self.stats["XP"] >= self.currentStats["MaxXP"]:
+			self.stats["XP"] -= self.currentStats["MaxXP"]
 			self.currentStats["MaxXP"] = round(self.currentStats["MaxXP"] * 1.5)
 			self.currentStats["LEVEL"] += 1
 			self.currentStats["MaxHP"] += self.nextLevel["HPIncrease"]
@@ -53,4 +57,5 @@ class Player(object):
 			self.currentStats["MaxSTR"] += self.nextLevel["STRIncrease"]
 			self.currentStats["MaxMagicSTR"] += self.nextLevel["MagicSTRIncrease"]
 			self.currentStats["MaxSPEED"] += self.nextLevel["SPEEDIncrease"]
-			screen.addstr(15, 35, f"YOU ARE NOW LEVEL {self.currentStats['LEVEL']}")
+			screen.addstr(16, 35, f"YOU ARE NOW LEVEL {self.currentStats['LEVEL']}")
+

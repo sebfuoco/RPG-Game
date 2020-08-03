@@ -74,10 +74,10 @@ def use(self, player, temp, i, target):
 	return temp
 
 def useItem(self, player, temp, i):
-	try:
-		if temp[0][i][0]["name"] == "HEALTH-POTION":
+	try:  # compare chosen item to initialised items
+		if temp[0][i][0] in (Items.HealthPotion, Items.SuperHealthPotion):
 			temp = use(self, player, temp, i, "HP")
-		elif temp[0][i][0]["name"] == "MANA-POTION":
+		elif temp[0][i][0] in (Items.ManaPotion, Items.SuperManaPotion):
 			temp = use(self, player, temp, i, "MP")
 		elif isinstance(temp[0][i][0]["heal"], str):
 			if player.status == "POISONED":

@@ -2,7 +2,7 @@ import MapAction
 from curses import wrapper
 from UI import *
 from ItemsAction import *
-from player import Classes, Player
+from player import Classes, Player, Magic
 from mobAction import attack
 
 def my_raw_input(screen, r, c, prompt_string, charlength):
@@ -46,7 +46,7 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
         elif x == "Merchant":
             choice = my_raw_input(self, 12, 35, "BUY OR SELL?", 4).decode("utf-8").upper()
             mainUI.logUI(self)
-            if choice == "BUY":
+            if choice in ("BUY", "B"):
                 try:
                     z = str(str(yCoord) + str(xCoord))
                     i = mainUI.merchantUI(self, yCoord, xCoord)
@@ -61,7 +61,7 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
                     mainUI.logUI(self)
                     pass
                 mainUI.clearOptionalUI(self)
-            elif choice == "SELL":
+            elif choice in ("SELL", "S"):
                 temp = inventoryUse(("ARMOUR", "WEAPON", "ITEM"), player, False)
                 try:
                     if temp:
@@ -84,10 +84,10 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
             mainUI.chestUI(self, yCoord, xCoord, player)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Quest":
-            mainUI.questUI(self, yCoord, xCoord)
+            mainUI.questUI(self, player, yCoord, xCoord)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Attack":
-            kill, yMob, xMob = attack(self, player, yCoord, xCoord, attackType)
+            attack(self, player, yCoord, xCoord, attackType)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
             mainUI.characterUI(self, player)
             self.refresh()
@@ -95,9 +95,9 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
             mainUI.clearOptionalUI(self)
             MapAction.currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"])
             yCoord, xCoord = MapAction.movePlayer(self, yCoord, xCoord)
-            if player.status == "POISONED":
-                player.stats["HP"] -= 1
-                mainUI.characterUI(self, player)
+        if player.status == "POISONED":
+            player.stats["HP"] -= 1
+            mainUI.characterUI(self, player)
     else:
         return originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation
     return yCoord, xCoord, spawnLocation
@@ -174,6 +174,22 @@ def main(main):
             yCoord, xCoord, spawnLocation = move(screen, "LEFT", yCoord, xCoord, spawnLocation, player, attackType)
         elif key == curses.KEY_RIGHT:
             yCoord, xCoord, spawnLocation = move(screen, "RIGHT", yCoord, xCoord, spawnLocation, player, attackType)
+        elif key in range(49, 58):  # 1-9
+            if player.stats["CLASS"] == "MAGE":
+                # key -= 48
+                try:
+                    Magic.selectedMagic = Magic.spellBook[key - 49]
+                    print(Magic.selectedMagic)
+                    screen.addstr(12, 35, f"{Magic.selectedMagic['name']} IS NOW EQUIPPED")
+                except IndexError:
+                    pass
+        elif key == 96:  # `
+            if player.stats["CLASS"] == "MAGE":
+                if attackType == "PHYSICAL":
+                    attackType = "MAGIC"
+                elif attackType == "MAGIC":
+                    attackType = "PHYSICAL"
+                screen.addstr(12, 35, f"YOU ARE NOW USING {attackType}")
         elif key in [105, 73]:  # "i" pressed
             mainUI.clearOptionalUI(screen)
             item = [player.Inventory for x in player.Inventory]
@@ -243,15 +259,9 @@ def main(main):
                 screen.refresh()
                 mainUI.logUI(screen)
                 mainUI.clearOptionalUI(screen)
-            elif command == "MODE":
+            elif command == "SPELLS":
                 if player.stats["CLASS"] == "MAGE":
-                    print("??")
-                    choice = my_raw_input(screen, 12, 35, "PHYSICAL OR MAGIC?", 8).decode("utf-8").upper()
-                    mainUI.logUI(screen)
-                    if choice == "PHYSICAL":
-                        attackType = "PHYSICAL"
-                    elif choice == "MAGIC":
-                        attackType = "MAGIC"
+                    mainUI.spells(screen, Magic.spellBook)
             elif command == "CHECK":
                 print(f"SPEED: {player.currentStats['MaxSPEED']} MAGIC STR: {player.currentStats['MaxMagicSTR']}")
         screen.move(12, 35)

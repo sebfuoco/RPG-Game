@@ -44,6 +44,14 @@ def loadNextMap(yCoord, xCoord, spawnLocation):
 		Maps.currentMapMobs = Maps.forestMobs
 		Maps.currentMapChest = Maps.forestChest
 		Maps.currentMapQuest = None
+	elif Maps.currentMapData[z] == Maps.mapNames.townSquareName:
+		Maps.currentMapName = Maps.mapNames.townSquareName
+		Maps.currentMap = Maps.townSquare
+		Maps.currentMapData = Maps.townSquareData
+		Maps.currentMapSpawn = Maps.townSquareSpawn
+		Maps.currentMapMobs = None
+		Maps.currentMapChest = None
+		Maps.currentMapQuest = None
 	yCoord, xCoord = respawnPlayer(spawnLocation)
 	return yCoord, xCoord
 
@@ -59,6 +67,8 @@ def detectCollision(self, yCoord, xCoord):
 		return "Merchant"
 	elif t in "Q":
 		return "Quest"
+	elif t in "I":
+		return "Information"
 	elif t in mobIcons.mobs:
 		return "Attack"
 
@@ -95,6 +105,11 @@ def respawnData(yCoord, xCoord, spawnLocation):
 		elif yCoord == 12 and xCoord == 15:
 			spawnLocation = 0
 	elif Maps.currentMapName == Maps.mapNames.forestName:
+		if yCoord == 1 and xCoord == 15:
+			spawnLocation = 1
+		elif yCoord == 12 and xCoord == 15:
+			spawnLocation = 0
+	elif Maps.currentMapName == Maps.mapNames.townSquareName:
 		spawnLocation = 0
 	return spawnLocation
 
@@ -105,7 +120,6 @@ def respawnPlayer(spawnLocation):
 
 def mobKill(kill, yMob, xMob):
 	zMob = str(str(yMob) + str(xMob))
-	#print(Maps.currentMapMobs)
 	def run():
 		for item in Maps.currentMapMobs.items():
 			i = 0

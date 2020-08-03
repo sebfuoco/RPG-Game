@@ -17,6 +17,13 @@ def mobAttack(self, player, x, order):
 			mobDamage = 0
 		player.stats["HP"] -= mobDamage
 		self.addstr(pos, 35, f"{currentMobLocation.mobLocation[x][0]['name']} DID {mobDamage} DAMAGE")
+		try:
+			if currentMobLocation.mobLocation[x][0]['inflict']:
+				statusEffect = random.randrange(0, 100)
+				if statusEffect < currentMobLocation.mobLocation[x][0]['inflict'][1]:
+					player.status = currentMobLocation.mobLocation[x][0]['inflict'][0]
+		except KeyError:
+			pass
 		if player.stats["HP"] < 0:
 			player.stats["HP"] = 0
 			return True
@@ -27,7 +34,7 @@ def mobAttack(self, player, x, order):
 def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType):
 	if attackType == "MAGIC":
 		if (player.stats["MP"] - Magic.selectedMagic["MANA"]) >= 0:
-			playerDamage = (player.currentStats["MaxMagicSTR"] * Magic.selectedMagic["POWER"]) - currentMobLocation.mobLocation[x][0]["DEF"]
+			playerDamage = math.floor(player.currentStats["MaxMagicSTR"] * Magic.selectedMagic["POWER"]) - currentMobLocation.mobLocation[x][0]["DEF"]
 			player.stats["MP"] -= Magic.selectedMagic["MANA"]
 		else:
 			playerDamage = player.currentStats["MaxSTR"] - currentMobLocation.mobLocation[x][0]["DEF"]
@@ -76,4 +83,3 @@ def attack(self, player, yCoord, xCoord, attackType):
 					break
 				playerAttack(self, player, x, i, yCoord, xCoord, order, attackType)
 		x += 1
-	return False, None, None
