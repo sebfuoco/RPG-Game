@@ -202,7 +202,7 @@ def main(main):
             if command == "HELP":
                 print("USE")
                 print("EQUIP")
-            elif command == "USE":
+            elif command in ("U", "USE"):
                 temp = inventoryUse(("ITEM",), player, False)
                 if temp:
                     mainUI.inventory(screen, temp)
@@ -220,7 +220,7 @@ def main(main):
                     curses.napms(1000)
                 mainUI.logUI(screen)
                 mainUI.clearOptionalUI(screen)
-            elif command == "EQUIP":
+            elif command in ("E", "EQUIP"):
                 temp = inventoryUse(("ARMOUR", "WEAPON"), player, True)
                 if temp:
                     mainUI.inventory(screen, temp)
@@ -259,9 +259,23 @@ def main(main):
                 screen.refresh()
                 mainUI.logUI(screen)
                 mainUI.clearOptionalUI(screen)
-            elif command == "SPELLS":
+            elif command in ("S", "SPELLS"):
                 if player.stats["CLASS"] == "MAGE":
                     mainUI.spells(screen, Magic.spellBook)
+            elif command in ("Q", "QUESTS"):
+                if not player.activeQuests:
+                    screen.addstr(1, 67, "NO ACTIVE QUESTS")
+                    screen.refresh()
+                else:
+                    active = ""
+                    i = 0
+                    print(len(player.activeQuests))
+                    while i < len(player.activeQuests):
+                        print(player.activeQuests[i][2][2]["GOLD"], player.activeQuests[i][2][2]["XP"], player.activeQuests[i][2][2]["REWARD"][0]["name"])
+                        active += f"{player.activeQuests[i][0]} IN {player.activeQuests[i][2][0]} | GOLD: {player.activeQuests[i][2][2]['GOLD']} XP: {player.activeQuests[i][2][2]['XP']} tab "
+                        i += 1
+                    print(active)
+                    mainUI.wrapText(screen, "ACTIVE QUESTS", active, 1, 67, UI)
             elif command == "CHECK":
                 print(f"SPEED: {player.currentStats['MaxSPEED']} MAGIC STR: {player.currentStats['MaxMagicSTR']}")
         screen.move(12, 35)

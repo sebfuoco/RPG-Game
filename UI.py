@@ -188,7 +188,10 @@ class mainUI:
 		self.addstr(i, 65, mapUI[1][0])
 		# TEXT
 		if (len(text) + pos + 2) <= maxPos:
-			text = text.replace("tab", "")
+			try:
+				text = text.replace("tab", "")
+			except AttributeError:
+				pass
 			self.addstr(i, pos, text)
 		else:
 			output = text.split()
@@ -211,11 +214,11 @@ class mainUI:
 		i = 1
 		pos = 67
 		try:
-			if Maps.currentMapQuest[z] in player.activeQuests:
+			if Maps.currentMapQuest[z][0] in player.activeQuests:
 				self.addstr(i, pos, "QUEST IN PROGRESS")
 			else:
-				mainUI.wrapText(self, Maps.currentMapQuest[z][0], Maps.currentMapQuest[z][1], i, pos, UI)
-				player.activeQuests.append(Maps.currentMapQuest[z])
+				mainUI.wrapText(self, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][1], i, pos, UI)
+				player.activeQuests.append(Maps.currentMapQuest[z][0])
 			#Maps.currentMapQuest.pop(z)
 		except KeyError:
 			print(Maps.currentMapQuest)

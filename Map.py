@@ -1,5 +1,6 @@
 from Items import *
 
+
 class Maps:
 	class mapNames:
 		townName = "TOWN"
@@ -36,21 +37,30 @@ class Maps:
 			["+==============================+"]]
 	homeData = {"42": mapNames.townName}
 	homeSpawn = [[4, 2]]
-	homeChest = {Items.HealthPotion['name']: [Items.HealthPotion, [3, 29]], Items.ManaPotion['name']: [Items.ManaPotion, [4, 29]]}
+	homeChest = {Items.HealthPotion['name']: [Items.HealthPotion, [3, 29]],
+				 Items.ManaPotion['name']: [Items.ManaPotion, [4, 29]]}
 	neighbour_home = [["+==============================+"],
-                      ["ǁ##############################ǁ"],
-                      ["ǁ#............................#ǁ"],
-                      ["ǁ#............................#ǁ"],
-                      ["ǁX...........................Q#ǁ"],
-                      ["ǁ#............................#ǁ"],
-                      ["ǁ#............................#ǁ"],
-                      ["ǁ#............................#ǁ"],
-                      ["ǁ##############################ǁ"],
-                      ["+==============================+"]]
+					  ["ǁ##############################ǁ"],
+					  ["ǁ#............................#ǁ"],
+					  ["ǁ#............................#ǁ"],
+					  ["ǁX...........................Q#ǁ"],
+					  ["ǁ#............................#ǁ"],
+					  ["ǁ#............................#ǁ"],
+					  ["ǁ#............................#ǁ"],
+					  ["ǁ##############################ǁ"],
+					  ["+==============================+"]]
 	neighbour_homeData = {"42": mapNames.townName}
 	neighbour_homeSpawn = [[4, 2]]
-	neighbour_homeQuest = {"429": ["DELIVER MESSAGE TO TOWN ELDER", f"HELLO YOUNG ONE, I AM TOO WEAK TO DELIVER THIS MESSAGE TO THE TOWN ELDER, CURRENTLY IN THE {mapNames.townSquareName}. "
-																	f"I WOULD BE DELIGHTED IF YOU SENT IT TO HIM.", [mapNames.townSquareName, [8, 16], {"GOLD": 10, "XP": 10, "REWARD": Items.SuperHealthPotion}]]}
+	neighbour_homeQuest = {"429": [["DELIVER MESSAGE TO TOWN ELDER",
+									f"HELLO YOUNG ONE, I AM TOO WEAK TO DELIVER THIS MESSAGE TO THE TOWN ELDER, CURRENTLY IN THE {mapNames.townSquareName}. "
+									f"I WOULD BE DELIGHTED IF YOU SENT IT TO HIM.", [mapNames.townSquareName, [8, 16],
+																					 {"GOLD": 10, "XP": 10,
+																					  "REWARD": [Items.SuperHealthPotion, 1]}]],
+								   ["DEFEAT THE SKELETON LORD",
+									f"AH YOUR BACK! I TAKE IT HE TOLD YOU OF THE DANGERS WITHIN THE CAVES. "
+									f"THE SKELETON LORD IS FEARSOME BUT HE IS WEAK TO LIGHT, USE THIS KNOWLEDGE TO DEFEAT HIM!",
+									[mapNames.townSquareName, [8, 16],
+									 {"GOLD": 10, "XP": 10, "REWARD": Items.HolyWater}]]]}
 	farm = [["+==============X===============+"],
 			["ǁ*************▒..##############ǁ"],
 			["ǁ*************▒..#............#ǁ"],
@@ -68,7 +78,9 @@ class Maps:
 	farmData = {"1215": mapNames.townName, "115": mapNames.forestName}
 	farmSpawn = [[1, 15], [12, 15]]
 	farmMobs = {"g": [[2, 25], [3, 29], [4, 27], [5, 22], [2, 23]]}
-	farmQuest = {"KILL MOBS": [4, 16]}
+	farmQuest = {"416": [["KILL GOBLINS",
+						f"I NEED YOUR HELP! THERE ARE GOBLINS IN MY BARN, PLEASE GET RID OF THEM FOR ME!.", [mapNames.farmName, [4, 16],
+						{"GOLD": 10, "XP": 10, "REWARD": [Equipment.Knife, 1]}]]]}
 	forest = [["+==============X===============+"],
 			  ["ǁ..............................ǁ"],
 			  ["ǁ.....****...***..........*****ǁ"],
@@ -86,23 +98,23 @@ class Maps:
 	forestData = {"1215": mapNames.farmName, "115": mapNames.townSquareName}
 	forestSpawn = [[1, 15], [12, 15]]
 	forestChest = {Items.HealthPotion['name']: [Items.HealthPotion, [9, 23]],
-				 Items.Antidote['name']: [Items.Antidote, [5, 11]]}
+				   Items.Antidote['name']: [Items.Antidote, [5, 11]]}
 	forestMobs = {"s": [[11, 3], [9, 14], [9, 7], [9, 24]], "r": [[12, 5], [6, 18]], "q": [[1, 14]]}
 	townSquare = [["+==============X===============+"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ...........▒▒▒▒▒▒▒▒...........ǁ"],
-			  	  ["X...........▒▒▒..▒▒▒...........X"],
-			  	  ["ǁ...........▒▒▒▒I▒▒▒...........ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["ǁ..............................ǁ"],
-			  	  ["+==============X===============+"]]
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ...........▒▒▒▒▒▒▒▒...........ǁ"],
+				  ["X...........▒▒▒..▒▒▒...........X"],
+				  ["ǁ...........▒▒▒▒I▒▒▒...........ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["+==============X===============+"]]
 	townSquareData = {"1315": mapNames.forestName}
 	townSquareSpawn = [[1, 15], [13, 15], [7, 1], [7, 31]]
 
