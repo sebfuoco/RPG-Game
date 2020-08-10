@@ -11,7 +11,7 @@ class Magic:
 class Classes:
 	# Warrior Stats + Factors
 	class Warrior:
-		stats = {"CLASS": "WARRIOR", "HP": 20, "MP": 0, "STR": 3, "MagicSTR": 0, "DEF": 1, "SPEED": 1, "EVASION": 0}
+		stats = {"CLASS": "WARRIOR", "HP": 20, "MP": 0, "STR": 31, "MagicSTR": 0, "DEF": 1, "SPEED": 1, "EVASION": 0}
 		nextLevel = {"HPIncrease": 5, "MPIncrease": 0, "STRIncrease": 1, "MagicSTRIncrease": 0, "SPEEDIncrease": 0.5}
 		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
 					"RIGHT-HAND": Equipment.WoodenSword}

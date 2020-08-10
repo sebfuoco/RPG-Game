@@ -178,7 +178,7 @@ class mainUI:
 			pass
 
 	def wrapText(self, title, text, i, pos, mapUI):
-		maxPos = pos + 36
+		maxPos = pos + 35
 		# TITLE
 		self.addstr(0, 65, mapUI[0][0])
 		self.addstr(i, 65, mapUI[1][0])
@@ -208,22 +208,63 @@ class mainUI:
 						pos += len(word) + 1
 		self.addstr(i + 1, 65, mapUI[0][0])
 
+	def loopInventory(self, player, reward, amount):
+		i = 0
+		item = [player.Inventory for x in player.Inventory]
+		for x in item:
+			if player.Inventory[i].count(reward):
+				player.Inventory[i][1] += amount
+				i = "IGNORE"
+				break
+			i += 1
+		if i != "IGNORE":
+			player.Inventory.append([reward, amount])
+
+	def questReward(self, player, reward):
+		mainUI.loopInventory(self, player, reward["REWARD"][0], reward["REWARD"][1])
+		player.Gold += reward["GOLD"]
+		player.stats["XP"] += reward["XP"]
+
+	def checkQuest(self, player, z):
+		i = 0
+		if Maps.currentMapName == Maps.mapNames.farmName:
+			if not mobs.currentMobLocation.mobLocation:
+				while i < len(player.activeQuests):
+					print(player.activeQuests[i])
+					if Maps.currentMapQuest[z][0] == player.activeQuests[i]:
+						mainUI.questReward(self, player, Maps.currentMapQuest[z][0][2][2])
+						del Maps.currentMapQuest[z][0]
+						del player.activeQuests[i]
+						break
+					i += 1
+
 	def questUI(self, player, yCoord, xCoord):
 		mainUI.clearOptionalUI(self)
 		z = str(str(yCoord) + str(xCoord))
 		i = 1
 		pos = 67
 		try:
+			mainUI.checkQuest(self, player, z)
 			if Maps.currentMapQuest[z][0] in player.activeQuests:
 				self.addstr(i, pos, "QUEST IN PROGRESS")
 			else:
 				mainUI.wrapText(self, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][1], i, pos, UI)
 				player.activeQuests.append(Maps.currentMapQuest[z][0])
-			#Maps.currentMapQuest.pop(z)
+				if Maps.currentMapQuest[z][0][0] == Maps.neighbour_homeQuest["429"][0][0]:
+					Maps.townSquareInfo[-1] += 1
 		except KeyError:
-			print(Maps.currentMapQuest)
 			if Maps.currentMapQuest[z] == "IN PROGRESS":
 				self.addstr(i, pos, "QUEST IN PROGRESS")
+		except IndexError:
+			self.addstr(i, pos, "QUEST COMPLETE")
+
+	def informationUI(self, yCoord, xCoord):
+		mainUI.clearOptionalUI(self)
+		z = str(str(yCoord) + str(xCoord))
+		i = 1
+		pos = 67
+		j = Maps.currentMapInfo[-1]
+		mainUI.wrapText(self, Maps.currentMapInfo[0], Maps.currentMapInfo[j], i, pos, UI)
 
 	def clearOptionalUI(self):
 		i = 0
@@ -246,6 +287,8 @@ def loopMap(item, screen):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
+				elif item[col][0][row] in "~":  # Obstructions not coloured
+					screen.addstr(col, row, item[col][0][row], curses.color_pair(4))
 				elif item[col][0][row] in ("=", "ǁ", "+", ".", "#", "▒"):  # Obstructions not coloured
 					screen.addstr(col, row, item[col][0][row])
 				row += 1

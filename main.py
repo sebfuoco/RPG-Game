@@ -86,6 +86,10 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
         elif x == "Quest":
             mainUI.questUI(self, player, yCoord, xCoord)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+        elif x == "Information":
+            mainUI.informationUI(self, yCoord, xCoord)
+            yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            self.refresh()
         elif x == "Attack":
             attack(self, player, yCoord, xCoord, attackType)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
@@ -113,12 +117,14 @@ def main(main):
     curses.use_default_colors()
     for i in range(0, 16):
         curses.init_pair(i + 1, i, 0)
+
     """
     for i in range(0, 16):
         screen.addstr(str(i), curses.color_pair(i))
     screen.refresh()
     input = screen.getstr(3, 0, 0)
     """
+
     while True:
         screen.clear()
         screen.addstr(0, 0,
@@ -176,10 +182,8 @@ def main(main):
             yCoord, xCoord, spawnLocation = move(screen, "RIGHT", yCoord, xCoord, spawnLocation, player, attackType)
         elif key in range(49, 58):  # 1-9
             if player.stats["CLASS"] == "MAGE":
-                # key -= 48
                 try:
                     Magic.selectedMagic = Magic.spellBook[key - 49]
-                    print(Magic.selectedMagic)
                     screen.addstr(12, 35, f"{Magic.selectedMagic['name']} IS NOW EQUIPPED")
                 except IndexError:
                     pass
@@ -278,6 +282,7 @@ def main(main):
                     mainUI.wrapText(screen, "ACTIVE QUESTS", active, 1, 67, UI)
             elif command == "CHECK":
                 print(f"SPEED: {player.currentStats['MaxSPEED']} MAGIC STR: {player.currentStats['MaxMagicSTR']}")
+                print(mobs.currentMobLocation.mobLocation)
         screen.move(12, 35)
         screen.refresh()
     curses.endwin()

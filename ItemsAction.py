@@ -23,22 +23,9 @@ def sellItem(self, number, amount, player):
 	mainUI.logUI(self)
 
 def buyItem(self, number, amount, player, z):
-	#print(player.Inventory[0])
-	#print(townMerchant[z][number])
 	try:
 		if (townMerchant[z][number]["price"] * amount) <= player.Gold:
-			i = 0
-			item = [player.Inventory for x in player.Inventory]
-			for x in item:
-				if player.Inventory[i].count(townMerchant[z][number]):
-					player.Inventory[i][1] += amount
-					i = "IGNORE"
-					break
-				i += 1
-			player.Gold -= (townMerchant[z][number]["price"] * amount)
-			if i != "IGNORE":
-				player.Inventory.append([townMerchant[z][number], amount])
-			mainUI.charInventoryUI(self, player)
+			mainUI.loopInventory(self, player, townMerchant[z][number], amount)
 		else:
 			mainUI.clearOptionalUI(self)
 			self.addstr(0, 66, "NOT ENOUGH GOLD")
@@ -51,9 +38,7 @@ def searchInventory(player, target):
 	z = 0
 	if target != Equipment.Empty:
 		for x in player.Inventory:
-			# print(x[0], player.equipped["CHEST"])
 			if x[0] == target:
-				# print(player.Inventory[z][1])
 				player.Inventory[z][1] += 1
 				break
 			z += 1
@@ -143,14 +128,9 @@ def deleteItem(temp, player, i):
 			y += 1
 	elif temp[0][i][1] >= 1:
 		z = 0
-		#print(temp[0][i][0], temp[0][i][1])
-		#print(x[i][0], x[i][1])
 		while True:
 			if player.Inventory[z][0]["name"] == temp[0][i][0]["name"]:
-				#print(player.Inventory[i])
-				#print(player.Inventory[z], temp[0][i])
 				player.Inventory[z][1] = temp[0][i][1]
-				#print(player.Inventory[z], temp[0][i])
 				break
 			z += 1
 

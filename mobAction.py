@@ -55,7 +55,8 @@ def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType):
 		player.stats["XP"] += currentMobLocation.mobLocation[x][0]['XP']
 		player.Gold += currentMobLocation.mobLocation[x][0]['GOLD']
 		kill = currentMobLocation.mobLocation[x][0]['ICON']
-		player.levelUp(self)
+		if player.currentStats != 100:
+			player.levelUp(self)
 		del currentMobLocation.mobLocation[x]
 		self.addstr(yCoord, xCoord, ".")
 		self.refresh()
