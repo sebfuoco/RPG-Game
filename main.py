@@ -17,8 +17,8 @@ def my_raw_input(screen, r, c, prompt_string, charlength):
     curses.noecho()
     return input
 
-def loadMap(self, yCoord, xCoord, spawnLocation, player):
-    spawnLocation = MapAction.respawnData(yCoord, xCoord, spawnLocation)
+def loadMap(self, yCoord, xCoord, player):
+    spawnLocation = MapAction.respawnData(yCoord, xCoord)
     yCoord, xCoord = MapAction.loadNextMap(yCoord, xCoord, spawnLocation)
     self.clear()
     size = mainUI.worldUI(self, player)
@@ -36,12 +36,10 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
         xCoord -= 1
     elif direction == "RIGHT":
         xCoord += 1
-    else:
-        x = False
     x = MapAction.detectCollision(self, yCoord, xCoord)
     if x:
         if x == "loadMap":
-            yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation, player)
+            yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], player)
             yCoord, xCoord = MapAction.movePlayer(self, yCoord, xCoord)
         elif x == "Merchant":
             choice = my_raw_input(self, 12, 35, "BUY OR SELL?", 4).decode("utf-8").upper()
@@ -243,9 +241,9 @@ def main(main):
                                 mainUI.clearOptionalUI(screen)
                                 if choice == "HAND":
                                     choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
-                                    if choice == "RIGHT":
+                                    if choice in ("RIGHT", "r"):
                                         choice = "RIGHT-HAND"
-                                    elif choice == "LEFT":
+                                    elif choice in ("LEFT", "l"):
                                         choice = "LEFT-HAND"
                             mainUI.logUI(screen)
                             mainUI.clearOptionalUI(screen)
@@ -273,12 +271,9 @@ def main(main):
                 else:
                     active = ""
                     i = 0
-                    print(len(player.activeQuests))
                     while i < len(player.activeQuests):
-                        print(player.activeQuests[i][2][2]["GOLD"], player.activeQuests[i][2][2]["XP"], player.activeQuests[i][2][2]["REWARD"][0]["name"])
                         active += f"{player.activeQuests[i][0]} IN {player.activeQuests[i][2][0]} | GOLD: {player.activeQuests[i][2][2]['GOLD']} XP: {player.activeQuests[i][2][2]['XP']} tab "
                         i += 1
-                    print(active)
                     mainUI.wrapText(screen, "ACTIVE QUESTS", active, 1, 67, UI)
             elif command == "CHECK":
                 print(f"SPEED: {player.currentStats['MaxSPEED']} MAGIC STR: {player.currentStats['MaxMagicSTR']}")

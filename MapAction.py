@@ -44,35 +44,12 @@ def movePlayer(self, yCoord, xCoord):
 	self.refresh()
 	return yCoord, xCoord
 
-def respawnData(yCoord, xCoord, spawnLocation):
-	if Maps.currentMapName == Maps.mapNames.townName:
-		if yCoord == 1 and xCoord == 15:  # FARM
-			spawnLocation = 1
-		elif yCoord == 5 and xCoord == 19:  # NEIGHBOUR
-			spawnLocation = 0
-		elif yCoord == 11 and xCoord == 19:  # HOME
-			spawnLocation = 0
-	elif Maps.currentMapName == Maps.mapNames.homeName:
-		spawnLocation = 2  # TOWN
-	elif Maps.currentMapName == Maps.mapNames.neighbour_homeName:
-		spawnLocation = 1  # TOWN
-	elif Maps.currentMapName == Maps.mapNames.farmName:
-		if yCoord == 1 and xCoord == 15:
-			spawnLocation = 1
-		elif yCoord == 12 and xCoord == 15:
-			spawnLocation = 0
-	elif Maps.currentMapName == Maps.mapNames.forestName:
-		if yCoord == 1 and xCoord == 15:
-			spawnLocation = 1
-		elif yCoord == 12 and xCoord == 15:
-			spawnLocation = 0
-	elif Maps.currentMapName == Maps.mapNames.townSquareName:
-		if yCoord == 1 and xCoord == 15:
-			spawnLocation = 1
-	elif Maps.currentMapName == Maps.mapNames.castleGateName:
-		if yCoord == 7 and xCoord == 15:
-			spawnLocation = 0
-	return spawnLocation
+def respawnData(yCoord, xCoord):
+	for name in Maps.allMaps:
+		for coord in name[3]:
+			if yCoord == coord[0] and xCoord == coord[1] and Maps.currentMapName == name[0]:
+				spawnLocation = coord[2]
+				return spawnLocation
 
 def respawnPlayer(spawnLocation):
 	y = Maps.currentMapSpawn[spawnLocation][0]

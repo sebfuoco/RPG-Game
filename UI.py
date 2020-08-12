@@ -1,7 +1,19 @@
 import curses
 import mobs
-from Map import Maps
+from Map import Maps, mapNames
 from Items import *
+
+def loopInventory(player, reward, amount):
+	i = 0
+	item = [player.Inventory for x in player.Inventory]
+	for x in item:
+		if player.Inventory[i].count(reward):
+			player.Inventory[i][1] += amount
+			i = "IGNORE"
+			break
+		i += 1
+	if i != "IGNORE":
+		player.Inventory.append([reward, amount])
 
 class mainUI:
 	def worldUI(self, player):
@@ -24,7 +36,7 @@ class mainUI:
 							  ["+-----------------------------+"]]
 			i = 0
 			pos = 33
-			loopUI(i, pos, quickCharacter, self)
+			loopUI(i, pos, quickCharacter, self.addstr)
 			self.addstr(1, 35, f"{player.stats['CLASS']} LEVEL: {str(player.currentStats['LEVEL'])} | {player.status}",
 						curses.A_BLINK)
 			self.addstr(2, 39, f"{str(player.stats['HP'])} / {str(player.currentStats['MaxHP'])}")
@@ -46,7 +58,7 @@ class mainUI:
 					   ["+-----------------------------+"]]
 			i = 4
 			pos = 33
-			loopUI(i, pos, charInv, self)
+			loopUI(i, pos, charInv, self.addstr)
 			self.addstr(5, 35,
 						f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}     GOLD: {str(player.Gold)}",
 						curses.A_BLINK)
@@ -72,7 +84,7 @@ class mainUI:
 						["+-----------------------------+"]]
 			i = 10
 			pos = 33
-			loopUI(i, pos, commands, self)
+			loopUI(i, pos, commands, self.addstr)
 			self.addstr(i + 1, pos + 2, "LOG | PRESS C", curses.A_BLINK)
 			size = True
 		except curses.error:
@@ -87,7 +99,7 @@ class mainUI:
 		i = 15
 		pos = 0
 		try:
-			loopUI(i, pos, mapName, self)
+			loopUI(i, pos, mapName, self.addstr)
 			self.addstr(16, 2, Maps.currentMapName)
 			size = True
 		except curses.error:
@@ -97,14 +109,13 @@ class mainUI:
 
 	def spells(self, item):
 		i = 0
-		pos = 65
 		spell = ""
 		for x in item:
 			spell += f"{i + 1}. {x['name']}: {x['MANA']} MP "
 			if x != item[-1]:
 				spell += "tab "
 			i += 1
-		mainUI.wrapText(self, "SPELLS", spell, 1, 67, UI)
+		mainUI.wrapText(self, "SPELLS", spell, 1, 67, UI, "SIDE")
 
 	def inventory(self, item):
 		i = 0
@@ -114,7 +125,7 @@ class mainUI:
 			if x[i] != item[0][-1]:
 				inventoryItems += "tab "
 			i += 1
-		mainUI.wrapText(self, "INVENTORY", inventoryItems, 1, 67, UI)
+		mainUI.wrapText(self, "INVENTORY", inventoryItems, 1, 67, UI, "SIDE")
 
 	def merchantUI(self, yCoord, xCoord):
 		merchantItems = ""
@@ -131,16 +142,16 @@ class mainUI:
 			if j != townMerchant[z][-1]:
 				merchantItems += "tab "
 		amount = i
-		mainUI.wrapText(self, "FOR SALE", merchantItems, 1, 67, UI)
+		mainUI.wrapText(self, "FOR SALE", merchantItems, 1, 67, UI, "SIDE")
 		return amount
 
 	def chestToInventory(self, newItem, key, x):
-		if Maps.currentMapName == Maps.mapNames.homeName:
+		if Maps.currentMapName == mapNames.homeName:
 			self.addstr(newItem[x][0], newItem[x][1], ".")
 			del Maps.homeChest[key][x]
 			if len(Maps.homeChest[key]) == 1:
 				del Maps.homeChest[key]
-		elif Maps.currentMapName == Maps.mapNames.forestName:
+		elif Maps.currentMapName == mapNames.forestName:
 			self.addstr(newItem[x][0], newItem[x][1], ".")
 			del Maps.forestChest[key][x]
 			if len(Maps.forestChest[key]) == 1:
@@ -153,7 +164,7 @@ class mainUI:
 				 ["+-------------------------------------+"]]
 		i = 0
 		pos = 65
-		loopUI(i, pos, chest, self)
+		loopUI(i, pos, chest, self.addstr)
 		try:
 			for key in Maps.currentMapChest:
 				x = 1
@@ -177,8 +188,12 @@ class mainUI:
 		except KeyError:
 			pass
 
-	def wrapText(self, title, text, i, pos, mapUI):
-		maxPos = pos + 35
+	def wrapText(self, title, text, i, pos, mapUI, location):
+		startpos = pos
+		if location == "SIDE":
+			maxPos = pos + 34
+		else:
+			maxPos = pos + 29
 		# TITLE
 		self.addstr(0, 65, mapUI[0][0])
 		self.addstr(i, 65, mapUI[1][0])
@@ -187,7 +202,7 @@ class mainUI:
 		i += 1
 		self.addstr(i, 65, mapUI[1][0])
 		# TEXT
-		if (len(text) + pos + 2) <= maxPos:
+		if (len(text) + pos + 2) <= maxPos and text != "tab":
 			try:
 				text = text.replace("tab", "")
 			except AttributeError:
@@ -196,11 +211,11 @@ class mainUI:
 		else:
 			output = text.split()
 			for word in output:
-				if (len(word) + pos) <= maxPos and "tab" not in word:
+				if (len(word) + pos) < maxPos and "tab" not in word:
 					self.addstr(i, pos, word)
 					pos += len(word) + 1
 				else:
-					pos = 67
+					pos = startpos
 					i += 1
 					self.addstr(i, 65, mapUI[1][0])
 					if word != "tab":
@@ -208,29 +223,18 @@ class mainUI:
 						pos += len(word) + 1
 		self.addstr(i + 1, 65, mapUI[0][0])
 
-	def loopInventory(self, player, reward, amount):
-		i = 0
-		item = [player.Inventory for x in player.Inventory]
-		for x in item:
-			if player.Inventory[i].count(reward):
-				player.Inventory[i][1] += amount
-				i = "IGNORE"
-				break
-			i += 1
-		if i != "IGNORE":
-			player.Inventory.append([reward, amount])
-
 	def questReward(self, player, reward):
-		mainUI.loopInventory(self, player, reward["REWARD"][0], reward["REWARD"][1])
+		rewards = f"YOU GAINED {reward['REWARD'][1]} {reward['REWARD'][0]['name']}, {reward['GOLD']} GOLD, and {reward['XP']} XP"
+		mainUI.wrapText(self, "QUEST REWARDS", rewards, 12, 35, empty, "LOG")
+		loopInventory(player, reward["REWARD"][0], reward["REWARD"][1])
 		player.Gold += reward["GOLD"]
 		player.stats["XP"] += reward["XP"]
 
 	def checkQuest(self, player, z):
 		i = 0
-		if Maps.currentMapName == Maps.mapNames.farmName:
+		if Maps.currentMapName == mapNames.farmName:
 			if not mobs.currentMobLocation.mobLocation:
 				while i < len(player.activeQuests):
-					print(player.activeQuests[i])
 					if Maps.currentMapQuest[z][0] == player.activeQuests[i]:
 						mainUI.questReward(self, player, Maps.currentMapQuest[z][0][2][2])
 						del Maps.currentMapQuest[z][0]
@@ -248,7 +252,7 @@ class mainUI:
 			if Maps.currentMapQuest[z][0] in player.activeQuests:
 				self.addstr(i, pos, "QUEST IN PROGRESS")
 			else:
-				mainUI.wrapText(self, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][1], i, pos, UI)
+				mainUI.wrapText(self, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][1], i, pos, UI, "SIDE")
 				player.activeQuests.append(Maps.currentMapQuest[z][0])
 				if Maps.currentMapQuest[z][0][0] == Maps.neighbour_homeQuest["429"][0][0]:
 					Maps.townSquareInfo[-1] += 1
@@ -264,12 +268,12 @@ class mainUI:
 		i = 1
 		pos = 67
 		j = Maps.currentMapInfo[-1]
-		mainUI.wrapText(self, Maps.currentMapInfo[0], Maps.currentMapInfo[j], i, pos, UI)
+		mainUI.wrapText(self, Maps.currentMapInfo[0], Maps.currentMapInfo[j], i, pos, UI, "SIDE")
 
 	def clearOptionalUI(self):
 		i = 0
 		pos = 65
-		loopUI(i, pos, empty, self)
+		loopUI(i, pos, empty, self.addstr)
 		self.refresh()
 
 def loopMap(item, screen):
@@ -326,10 +330,10 @@ def chestMap(self):
 	except TypeError:
 		pass
 
-def loopUI(i, pos, item, screen):
+def loopUI(i, pos, item, addstr):
 	for r in item:
 		for c in r:
-			screen.addstr(i, pos, c)
+			addstr(i, pos, c)
 			i += 1
 
 empty = [["                                          "],

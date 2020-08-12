@@ -1,5 +1,5 @@
 from Items import *
-from UI import mainUI
+from UI import *
 from curses import napms
 
 def inventoryUse(target, player, addEmpty):
@@ -25,7 +25,7 @@ def sellItem(self, number, amount, player):
 def buyItem(self, number, amount, player, z):
 	try:
 		if (townMerchant[z][number]["price"] * amount) <= player.Gold:
-			mainUI.loopInventory(self, player, townMerchant[z][number], amount)
+			UI.loopInventory(player, townMerchant[z][number], amount)
 		else:
 			mainUI.clearOptionalUI(self)
 			self.addstr(0, 66, "NOT ENOUGH GOLD")
@@ -103,9 +103,9 @@ def equipItem(self, player, temp, i, choice):
 				elif temp[0][i][0]["equipLocation"] == "CHEST":
 					temp = equip(self, player, temp, i, "CHEST")
 				elif temp[0][i][0]["equipLocation"] == "HAND":
-					if choice == "RIGHT":
+					if choice in ("RIGHT", "R"):
 						temp = equip(self, player, temp, i, "RIGHT-HAND")
-					elif choice == "LEFT":
+					elif choice in ("LEFT", "L"):
 						temp = equip(self, player, temp, i, "LEFT-HAND")
 				mainUI.charInventoryUI(self, player)
 				self.refresh()
