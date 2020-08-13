@@ -1,7 +1,4 @@
-from Map import Maps
-from mobs import mobIcons
-
-def loadNextMap(yCoord, xCoord, spawnLocation):
+def loadNextMap(yCoord, xCoord, spawnLocation, Maps):
 	z = str(str(yCoord) + str(xCoord))
 	for name in Maps.allMaps:
 		if Maps.currentMapData[z] == name[0]:
@@ -14,10 +11,10 @@ def loadNextMap(yCoord, xCoord, spawnLocation):
 			Maps.currentMapQuest = name[6]
 			Maps.currentMapInfo = name[7]
 			break
-	yCoord, xCoord = respawnPlayer(spawnLocation)
+	yCoord, xCoord = respawnPlayer(spawnLocation, Maps)
 	return yCoord, xCoord
 
-def detectCollision(self, yCoord, xCoord):
+def detectCollision(self, yCoord, xCoord, mobs):
 	t = self.instr(yCoord, xCoord, 1).decode("utf-8")
 	if t in "X":
 		return "loadMap"
@@ -31,10 +28,10 @@ def detectCollision(self, yCoord, xCoord):
 		return "Quest"
 	elif t in "I":
 		return "Information"
-	elif t in mobIcons.mobs:
+	elif t in mobs:
 		return "Attack"
 
-def currentPosition(self, yCoord, xCoord):
+def currentPosition(self, yCoord, xCoord, Maps):
 	previousPosition = Maps.currentMap[yCoord][0][xCoord]
 	self.addstr(yCoord, xCoord, previousPosition)
 	self.refresh()
@@ -44,19 +41,19 @@ def movePlayer(self, yCoord, xCoord):
 	self.refresh()
 	return yCoord, xCoord
 
-def respawnData(yCoord, xCoord):
+def respawnData(yCoord, xCoord, Maps):
 	for name in Maps.allMaps:
 		for coord in name[3]:
 			if yCoord == coord[0] and xCoord == coord[1] and Maps.currentMapName == name[0]:
 				spawnLocation = coord[2]
 				return spawnLocation
 
-def respawnPlayer(spawnLocation):
+def respawnPlayer(spawnLocation, Maps):
 	y = Maps.currentMapSpawn[spawnLocation][0]
 	x = Maps.currentMapSpawn[spawnLocation][1]
 	return y, x
 
-def mobKill(kill, yMob, xMob):
+def mobKill(kill, yMob, xMob, Maps):
 	zMob = str(str(yMob) + str(xMob))
 	i = 0
 	temp = []

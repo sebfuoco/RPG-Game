@@ -1,5 +1,4 @@
 from Items import *
-from UI import *
 from curses import napms
 
 def inventoryUse(target, player, addEmpty):
@@ -9,25 +8,25 @@ def inventoryUse(target, player, addEmpty):
 			temp.append([x[0], x[1]])
 	if addEmpty:
 		temp.append([Equipment.Empty, 1])
-	temp = [temp for x in temp]
+	temp = [temp for _ in temp]
 	return temp
 
-def sellItem(self, number, amount, player):
+def sellItem(self, number, amount, player, charInventoryUI, logUI):
 	if player.Inventory[number]:
 		if (player.Inventory[number][1] - amount) >= 0:
 			player.Gold += (player.Inventory[number][0]["price"] * amount)
 			player.Inventory[number][1] -= amount
 	if player.Inventory[number][1] == 0:
 		del player.Inventory[number]
-	mainUI.charInventoryUI(self, player)
-	mainUI.logUI(self)
+	charInventoryUI(self, player)
+	logUI(self)
 
-def buyItem(self, number, amount, player, z):
+def buyItem(self, number, amount, player, z, loopInventory, clearOptionalUI):
 	try:
 		if (townMerchant[z][number]["price"] * amount) <= player.Gold:
-			UI.loopInventory(player, townMerchant[z][number], amount)
+			loopInventory(player, townMerchant[z][number], amount)
 		else:
-			mainUI.clearOptionalUI(self)
+			clearOptionalUI(self)
 			self.addstr(0, 66, "NOT ENOUGH GOLD")
 			self.refresh()
 			napms(1000)
@@ -58,7 +57,7 @@ def use(self, player, temp, i, target):
 		player.stats[target] = player.currentStats["Max" + target]
 	return temp
 
-def useItem(self, player, temp, i):
+def useItem(self, player, temp, i, characterUI):
 	try:  # compare chosen item to initialised items
 		if temp[0][i][0] in (Items.HealthPotion, Items.SuperHealthPotion):
 			temp = use(self, player, temp, i, "HP")
@@ -72,7 +71,7 @@ def useItem(self, player, temp, i):
 				self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
 				self.refresh()
 				napms(1000)
-		mainUI.characterUI(self, player)
+		characterUI(self, player)
 		self.refresh()
 		return temp, i
 	except IndexError:
@@ -90,11 +89,19 @@ def equip(self, player, temp, i, target):
 		napms(1000)
 	return temp
 
-def equipItem(self, player, temp, i, choice):
+def equipItem(self, player, temp, i, choice, charInventoryUI):
 	try:
 		if temp[0][i][0]["name"] == "EMPTY":
+			if choice in ("HEAD", "H"):
+				choice = "HEAD"
+			elif choice in ("CHEST", "C"):
+				choice = "CHEST"
+			elif choice in ("LEFT-HAND", "LEFT", "L"):
+				choice = "LEFT-HAND"
+			elif choice in ("RIGHT-HAND", "RIGHT", "R"):
+				choice = "RIGHT-HAND"
 			temp = equip(self, player, temp, i, choice)
-			mainUI.charInventoryUI(self, player)
+			charInventoryUI(self, player)
 			self.refresh()
 		else:
 			if player.stats["CLASS"] in temp[0][i][0]["equipClass"]:
@@ -103,11 +110,11 @@ def equipItem(self, player, temp, i, choice):
 				elif temp[0][i][0]["equipLocation"] == "CHEST":
 					temp = equip(self, player, temp, i, "CHEST")
 				elif temp[0][i][0]["equipLocation"] == "HAND":
-					if choice in ("RIGHT", "R"):
+					if choice in ("RIGHT-HAND", "RIGHT", "R"):
 						temp = equip(self, player, temp, i, "RIGHT-HAND")
-					elif choice in ("LEFT", "L"):
+					elif choice in ("LEFT-HAND", "LEFT", "L"):
 						temp = equip(self, player, temp, i, "LEFT-HAND")
-				mainUI.charInventoryUI(self, player)
+				charInventoryUI(self, player)
 				self.refresh()
 			else:
 				self.addstr(12, 35, f"CANNOT EQUIP {temp[0][i][0]['name']}")

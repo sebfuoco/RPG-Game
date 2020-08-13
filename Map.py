@@ -70,7 +70,7 @@ class Maps:
 
 	allNeighbour = [mapNames.neighbour_homeName, neighbour_home, neighbour_homeData, neighbour_homeSpawn, None, None, neighbour_homeQuest, None]
 	farm = [["+==============X===============+"],
-			["ǁ*************▒..##############ǁ"],
+			["ǁ*************▒.I##############ǁ"],
 			["ǁ*************▒..#............#ǁ"],
 			["ǁ*************▒...............#ǁ"],
 			["ǁ*************▒.Q#............#ǁ"],
@@ -86,8 +86,9 @@ class Maps:
 	farmData = {"1215": mapNames.townName, "115": mapNames.forestName}
 	farmSpawn = [[1, 15, 1], [12, 15, 0]]
 	farmMobs = {"g": [[2, 23], [2, 25], [3, 29], [4, 27], [5, 22]]}
+	farmInfo = initInfo(0)
 	farmQuest = initQuest(1)
-	allFarm = [mapNames.farmName, farm, farmData, farmSpawn, farmMobs, None, farmQuest, None]
+	allFarm = [mapNames.farmName, farm, farmData, farmSpawn, farmMobs, None, farmQuest, farmInfo]
 	forest = [["+==============X===============+"],
 			  ["ǁ..............................ǁ"],
 			  ["ǁ.....****...***..........*****ǁ"],
@@ -125,7 +126,7 @@ class Maps:
 				  ["+==============X===============+"]]
 	townSquareData = {"115": mapNames.castleGateName, "71": mapNames.fieldName, "1315": mapNames.forestName}
 	townSquareSpawn = [[1, 15, 1], [7, 1, 1], [7, 30], [13, 15, 0]]
-	townSquareInfo = initInfo(0)
+	townSquareInfo = initInfo(1)
 	allTownSquare = [mapNames.townSquareName, townSquare, townSquareData, townSquareSpawn, None, None, None, townSquareInfo]
 	castleGate = [["+==============X===============+"],
 				  ["ǁ..............................ǁ"],
@@ -138,7 +139,7 @@ class Maps:
 				  ["+==============X===============+"]]
 	castleGateData = {"715": mapNames.townSquareName}
 	castleGateSpawn = [[1, 15], [7, 15, 0]]
-	castleGateInfo = initInfo(1)
+	castleGateInfo = initInfo(2)
 	allCastleGate = [mapNames.castleGateName, castleGate, castleGateData, castleGateSpawn, None, None, None, castleGateInfo]
 	field = [["+==============================+"],
 			 ["ǁ................*.*.*.*.......ǁ"],
@@ -172,11 +173,12 @@ class Maps:
 
 	quickStartMap = [[town, mapNames.townName, townData, townSpawn, None, None, None, None],
 					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, None, townSquareInfo]]
-	currentMap = quickStartMap[0][0]
-	currentMapName = quickStartMap[0][1]
-	currentMapData = quickStartMap[0][2]
-	currentMapSpawn = quickStartMap[0][3]
-	currentMapMobs = quickStartMap[0][4]
-	currentMapChest = quickStartMap[0][5]
-	currentMapQuest = quickStartMap[0][6]
-	currentMapInfo = quickStartMap[0][7]
+	i = 0
+	currentMap = quickStartMap[i][0]
+	currentMapName = quickStartMap[i][1]
+	currentMapData = quickStartMap[i][2]
+	currentMapSpawn = quickStartMap[i][3]
+	currentMapMobs = quickStartMap[i][4]
+	currentMapChest = quickStartMap[i][5]
+	currentMapQuest = quickStartMap[i][6]
+	currentMapInfo = quickStartMap[i][7]

@@ -1,7 +1,11 @@
 import MapAction
+import mobs
 from curses import wrapper
 from UI import *
+from Map import Maps, mapNames
 from ItemsAction import *
+from questAction import quest
+from UIAction import loopInventory, wrapText
 from player import Classes, Player, Magic
 from mobAction import attack
 
@@ -18,12 +22,12 @@ def my_raw_input(screen, r, c, prompt_string, charlength):
     return input
 
 def loadMap(self, yCoord, xCoord, player):
-    spawnLocation = MapAction.respawnData(yCoord, xCoord)
-    yCoord, xCoord = MapAction.loadNextMap(yCoord, xCoord, spawnLocation)
+    spawnLocation = MapAction.respawnData(yCoord, xCoord, Maps)
+    yCoord, xCoord = MapAction.loadNextMap(yCoord, xCoord, spawnLocation, Maps)
     self.clear()
-    size = mainUI.worldUI(self, player)
-    mobMap(self)
-    chestMap(self)
+    size = mainUI.worldUI(self, player, Maps)
+    mobMap(self, Maps.currentMapMobs, mobs, Maps.currentMap)
+    chestMap(self, Maps.currentMapChest)
     return yCoord, xCoord, spawnLocation, size
 
 def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
@@ -36,7 +40,7 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
         xCoord -= 1
     elif direction == "RIGHT":
         xCoord += 1
-    x = MapAction.detectCollision(self, yCoord, xCoord)
+    x = MapAction.detectCollision(self, yCoord, xCoord, mobs.mobIcons.mobs)
     if x:
         if x == "loadMap":
             yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], player)
@@ -47,14 +51,14 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
             if choice in ("BUY", "B"):
                 try:
                     z = str(str(yCoord) + str(xCoord))
-                    i = mainUI.merchantUI(self, yCoord, xCoord)
+                    i = mainUI.merchantUI(self, yCoord, xCoord, townMerchant)
                     number = int(my_raw_input(self, 12, 35, "WHAT WILL YOU BUY?", 1).decode("utf-8")) - 1
                     if (number + 1) > i:
                         raise ValueError
                     mainUI.logUI(self)
                     amount = int(my_raw_input(self, 12, 35, "HOW MANY WILL YOU BUY?", 1).decode("utf-8"))
                     mainUI.logUI(self)
-                    buyItem(self, number, amount, player, z)
+                    buyItem(self, number, amount, player, z, loopInventory, mainUI.clearOptionalUI)
                 except ValueError:
                     mainUI.logUI(self)
                     pass
@@ -70,7 +74,7 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
                                 raise ValueError
                             mainUI.logUI(self)
                             amount = int(my_raw_input(self, 12, 35, "HOW MANY WILL YOU SELL?", 1).decode("utf-8"))
-                            sellItem(self, number, amount, player)
+                            sellItem(self, number, amount, player, mainUI.charInventoryUI, mainUI.logUI)
                         except ValueError:
                             mainUI.logUI(self)
                             pass
@@ -79,23 +83,23 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
                     pass
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Chest":
-            mainUI.chestUI(self, yCoord, xCoord, player)
+            mainUI.chestUI(self, yCoord, xCoord, player, Maps, mapNames)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Quest":
-            mainUI.questUI(self, player, yCoord, xCoord)
+            mainUI.questUI(self, player, yCoord, xCoord, Maps, mapNames, quest)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Information":
-            mainUI.informationUI(self, yCoord, xCoord)
+            mainUI.informationUI(self, yCoord, xCoord, Maps.currentMapInfo)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
             self.refresh()
         elif x == "Attack":
-            attack(self, player, yCoord, xCoord, attackType)
+            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation.mobLocation, mainUI.charInventoryUI)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
             mainUI.characterUI(self, player)
             self.refresh()
         else:
             mainUI.clearOptionalUI(self)
-            MapAction.currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            MapAction.currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"], Maps)
             yCoord, xCoord = MapAction.movePlayer(self, yCoord, xCoord)
         if player.status == "POISONED":
             player.stats["HP"] -= 1
@@ -107,7 +111,6 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
 def main(main):
     yCoord = 12
     xCoord = 15
-    size = True
     spawnLocation = 0
     attackType = "PHYSICAL"
     screen = curses.initscr()
@@ -149,7 +152,7 @@ def main(main):
             curses.napms(500)
     EquipmentStats(player)
     screen.clear()
-    size = mainUI.worldUI(screen, player)
+    size = mainUI.worldUI(screen, player, Maps)
     MapAction.movePlayer(screen, yCoord, xCoord)
     curses.noecho()
     screen.move(12, 35)
@@ -194,7 +197,7 @@ def main(main):
                 screen.addstr(12, 35, f"YOU ARE NOW USING {attackType}")
         elif key in [105, 73]:  # "i" pressed
             mainUI.clearOptionalUI(screen)
-            item = [player.Inventory for x in player.Inventory]
+            item = [player.Inventory for _ in player.Inventory]
             mainUI.inventory(screen, item)
         elif key in [99, 67]:  # "c" pressed
             curses.curs_set(1)
@@ -212,7 +215,7 @@ def main(main):
                         answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
                         mainUI.logUI(screen)
                         mainUI.clearOptionalUI(screen)
-                        temp, i = useItem(screen, player, temp, answer)
+                        temp, i = useItem(screen, player, temp, answer, mainUI.characterUI)
                         deleteItem(temp, player, i)
                     except (TypeError, ValueError):
                         pass
@@ -239,15 +242,9 @@ def main(main):
                                 choice = my_raw_input(screen, 12, 35, "WHERE TO UNEQUIP?", 5).decode("utf-8").upper()
                                 mainUI.logUI(screen)
                                 mainUI.clearOptionalUI(screen)
-                                if choice == "HAND":
-                                    choice = my_raw_input(screen, 12, 35, "WHICH HAND?", 5).decode("utf-8").upper()
-                                    if choice in ("RIGHT", "r"):
-                                        choice = "RIGHT-HAND"
-                                    elif choice in ("LEFT", "l"):
-                                        choice = "LEFT-HAND"
                             mainUI.logUI(screen)
                             mainUI.clearOptionalUI(screen)
-                            temp, i = equipItem(screen, player, temp, answer, choice)
+                            temp, i = equipItem(screen, player, temp, answer, choice, mainUI.charInventoryUI)
                             deleteItem(temp, player, i)
                         except IndexError:
                             mainUI.logUI(screen)
@@ -274,7 +271,7 @@ def main(main):
                     while i < len(player.activeQuests):
                         active += f"{player.activeQuests[i][0]} IN {player.activeQuests[i][2][0]} | GOLD: {player.activeQuests[i][2][2]['GOLD']} XP: {player.activeQuests[i][2][2]['XP']} tab "
                         i += 1
-                    mainUI.wrapText(screen, "ACTIVE QUESTS", active, 1, 67, UI)
+                    wrapText(screen.addstr, "ACTIVE QUESTS", active, 1, 67, UI, "SIDE")
             elif command == "CHECK":
                 print(f"SPEED: {player.currentStats['MaxSPEED']} MAGIC STR: {player.currentStats['MaxMagicSTR']}")
                 print(mobs.currentMobLocation.mobLocation)
