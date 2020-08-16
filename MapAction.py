@@ -10,6 +10,7 @@ def loadNextMap(yCoord, xCoord, spawnLocation, Maps):
 			Maps.currentMapChest = name[5]
 			Maps.currentMapQuest = name[6]
 			Maps.currentMapInfo = name[7]
+			Maps.currentMapMerchant = name[8]
 			break
 	yCoord, xCoord = respawnPlayer(spawnLocation, Maps)
 	return yCoord, xCoord

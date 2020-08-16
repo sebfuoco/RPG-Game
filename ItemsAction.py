@@ -21,10 +21,10 @@ def sellItem(self, number, amount, player, charInventoryUI, logUI):
 	charInventoryUI(self, player)
 	logUI(self)
 
-def buyItem(self, number, amount, player, z, loopInventory, clearOptionalUI):
+def buyItem(self, number, amount, player, z, currentMerchant, loopInventory, clearOptionalUI):
 	try:
-		if (townMerchant[z][number]["price"] * amount) <= player.Gold:
-			loopInventory(player, townMerchant[z][number], amount)
+		if (currentMerchant[z][number]["price"] * amount) <= player.Gold:
+			loopInventory(player, currentMerchant[z][number], amount)
 		else:
 			clearOptionalUI(self)
 			self.addstr(0, 66, "NOT ENOUGH GOLD")
@@ -59,18 +59,21 @@ def use(self, player, temp, i, target):
 
 def useItem(self, player, temp, i, characterUI):
 	try:  # compare chosen item to initialised items
-		if temp[0][i][0] in (Items.HealthPotion, Items.SuperHealthPotion):
-			temp = use(self, player, temp, i, "HP")
-		elif temp[0][i][0] in (Items.ManaPotion, Items.SuperManaPotion):
-			temp = use(self, player, temp, i, "MP")
-		elif isinstance(temp[0][i][0]["heal"], str):
-			if player.status == "POISONED":
-				player.status = "NORMAL"
-				temp[0][i][1] -= 1
-			else:
-				self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
-				self.refresh()
-				napms(1000)
+		if temp[0][i][0]["throwable"]:
+			print("YO")
+		else:
+			if temp[0][i][0] in (Items.HealthPotion, Items.SuperHealthPotion):
+				temp = use(self, player, temp, i, "HP")
+			elif temp[0][i][0] in (Items.ManaPotion, Items.SuperManaPotion):
+				temp = use(self, player, temp, i, "MP")
+			elif isinstance(temp[0][i][0]["heal"], str):
+				if player.status == "POISONED":
+					player.status = "NORMAL"
+					temp[0][i][1] -= 1
+				else:
+					self.addstr(12, 35, f"{temp[0][i][0]['name']} HAD NO EFFECT")
+					self.refresh()
+					napms(1000)
 		characterUI(self, player)
 		self.refresh()
 		return temp, i
@@ -142,19 +145,15 @@ def deleteItem(temp, player, i):
 			z += 1
 
 def EquipmentStats(player):
-	strength = 0
-	defense = 0
-	evasion = 0
-	speed = 0
+	stats = {"STR": 0, "DEF": 0, "EVASION": 0, "SPEED": 0}
 	for key, value in player.equipped.items():
-		strength += value["STR"]
-		defense += value["DEF"]
+		stats["STR"] += value["STR"]
+		stats["DEF"] += value["DEF"]
 		if value["type"] == "ARMOUR":
-			evasion += value["EVASION"]
-		if value["type"] == "ARMOUR":
-			speed += value["SPEED"]
-
-	player.currentStats["MaxSTR"] = player.stats["STR"] + strength
-	player.currentStats["MaxDEF"] = player.stats["DEF"] + defense
-	player.currentStats["MaxEVASION"] = player.stats["EVASION"] + evasion
-	player.currentStats["MaxSPEED"] = player.stats["SPEED"] + speed
+			stats["EVASION"] += value["EVASION"]
+			stats["SPEED"] += value["SPEED"]
+	for stat in stats:
+		if player.stats[stat] + stats[stat] < 0:
+			player.currentStats["Max" + stat] = 0
+		else:
+			player.currentStats["Max" + stat] = player.stats[stat] + stats[stat]

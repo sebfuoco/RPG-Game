@@ -113,19 +113,22 @@ class mainUI:
 			i += 1
 		wrapText(self.addstr, "INVENTORY", inventoryItems, 1, 67, UI, "SIDE")
 
-	def merchantUI(self, yCoord, xCoord, townMerchant):
+	def merchantUI(self, yCoord, xCoord, currentMerchant):
 		merchantItems = ""
 		i = 0
 		z = str(str(yCoord) + str(xCoord))
-		for j in townMerchant[z]:
+		for j in currentMerchant[z]:
 			i += 1
 			if j["type"] == "ARMOUR":
 				merchantItems += f" {i}. {j['name']} DEF: {str(j['DEF'])} PRICE: {str(j['price'])} "
 			elif j["type"] == "WEAPON":
 				merchantItems += f"{i}. {j['name']} STR: {str(j['STR'])} PRICE: {str(j['price'])} "
 			elif j["type"] == "ITEM":
-				merchantItems += f"{i}. {j['name']} HEAL: {str(j['heal'])} PRICE: {str(j['price'])} "
-			if j != townMerchant[z][-1]:
+				if j["throwable"]:
+					merchantItems += f"{i}. {j['name']} DAMAGE: {str(j['damage'])} PRICE: {str(j['price'])} "
+				else:
+					merchantItems += f"{i}. {j['name']} HEAL: {str(j['heal'])} PRICE: {str(j['price'])} "
+			if j != currentMerchant[z][-1]:
 				merchantItems += "tab "
 		amount = i
 		wrapText(self.addstr, "FOR SALE", merchantItems, 1, 67, UI, "SIDE")
@@ -180,9 +183,10 @@ class mainUI:
 		i = 1
 		pos = 67
 		try:
-			quest.checkQuest(self.addstr, player, z, Maps, mapNames, loopInventory, wrapText)
 			if Maps.currentMapQuest[z][0] in player.activeQuests:
-				self.addstr(i, pos, "QUEST IN PROGRESS")
+				notComplete = quest.checkQuest(self.addstr, player, z, Maps, mapNames, loopInventory, wrapText)
+				if notComplete:
+					self.addstr(i, pos, "QUEST IN PROGRESS")
 			else:
 				wrapText(self.addstr, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][1], i, pos, UI, "SIDE")
 				player.activeQuests.append(Maps.currentMapQuest[z][0])
@@ -194,13 +198,15 @@ class mainUI:
 		except IndexError:
 			self.addstr(i, pos, "QUEST COMPLETE")
 
-	def informationUI(self, yCoord, xCoord, currentMapInfo):
+	def informationUI(self, yCoord, xCoord, Maps, mobs):
 		mainUI.clearOptionalUI(self)
 		z = str(str(yCoord) + str(xCoord))
 		i = 1
 		pos = 67
-		j = currentMapInfo[z][-1]
-		wrapText(self.addstr, currentMapInfo[z][0], currentMapInfo[z][j], i, pos, UI, "SIDE")
+		if Maps.currentMapName == Maps.allFarm[0] and mobs.currentMobLocation.killBoss[mobs.mobList.queenSpider["name"]] and Maps.farmInfo[z][-1] == 1:
+			Maps.farmInfo[z][-1] += 1
+		j = Maps.currentMapInfo[z][-1]
+		wrapText(self.addstr, Maps.currentMapInfo[z][0], Maps.currentMapInfo[z][j], i, pos, UI, "SIDE")
 
 	def clearOptionalUI(self):
 		i = 0
@@ -212,7 +218,7 @@ def loopMap(item, screen):
 	try:
 		col, row = (0, 0)
 		while col < len(item):
-			for i in enumerate(item[0][0]):
+			for _ in enumerate(item[0][0]):
 				if item[col][0][row] in "X":
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(1))
 				elif item[col][0][row] in "*":

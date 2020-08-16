@@ -3,6 +3,7 @@ import mobs
 from curses import wrapper
 from UI import *
 from Map import Maps, mapNames
+from MapSettings import merchants
 from ItemsAction import *
 from questAction import quest
 from UIAction import loopInventory, wrapText
@@ -51,14 +52,14 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
             if choice in ("BUY", "B"):
                 try:
                     z = str(str(yCoord) + str(xCoord))
-                    i = mainUI.merchantUI(self, yCoord, xCoord, townMerchant)
+                    i = mainUI.merchantUI(self, yCoord, xCoord, Maps.currentMapMerchant)
                     number = int(my_raw_input(self, 12, 35, "WHAT WILL YOU BUY?", 1).decode("utf-8")) - 1
                     if (number + 1) > i:
                         raise ValueError
                     mainUI.logUI(self)
                     amount = int(my_raw_input(self, 12, 35, "HOW MANY WILL YOU BUY?", 1).decode("utf-8"))
                     mainUI.logUI(self)
-                    buyItem(self, number, amount, player, z, loopInventory, mainUI.clearOptionalUI)
+                    buyItem(self, number, amount, player, z, Maps.currentMapMerchant, loopInventory, mainUI.clearOptionalUI)
                 except ValueError:
                     mainUI.logUI(self)
                     pass
@@ -89,11 +90,11 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
             mainUI.questUI(self, player, yCoord, xCoord, Maps, mapNames, quest)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Information":
-            mainUI.informationUI(self, yCoord, xCoord, Maps.currentMapInfo)
+            mainUI.informationUI(self, yCoord, xCoord, Maps, mobs)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
             self.refresh()
         elif x == "Attack":
-            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation.mobLocation, mainUI.charInventoryUI)
+            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI)
             yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
             mainUI.characterUI(self, player)
             self.refresh()
@@ -258,6 +259,23 @@ def main(main):
                 screen.refresh()
                 mainUI.logUI(screen)
                 mainUI.clearOptionalUI(screen)
+            elif command in ("I", "INFO"):
+                temp = inventoryUse(("ITEM",), player, False)
+                if temp:
+                    mainUI.inventory(screen, temp)
+                    try:
+                        answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO INSPECT?", 1).decode("utf-8")) - 1
+                        mainUI.logUI(screen)
+                        mainUI.clearOptionalUI(screen)
+                        answer = f"{temp[1][answer][0]['name']}: {temp[1][answer][0]['description']}"
+                        wrapText(screen.addstr, "INFO", answer, 1, 67, UI, "SIDE")
+                    except (TypeError, ValueError):
+                        pass
+                else:
+                    screen.addstr(12, 35, f"NOTHING TO INSPECT")
+                    screen.refresh()
+                    curses.napms(1000)
+                mainUI.logUI(screen)
             elif command in ("S", "SPELLS"):
                 if player.stats["CLASS"] == "MAGE":
                     mainUI.spells(screen, Magic.spellBook)

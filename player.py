@@ -1,9 +1,9 @@
 from Items import Equipment, Items
 
 class Magic:
-	Fire = {"name": "FIRE", "POWER": 5, "MANA": 5}
-	Ice = {"name": "ICE", "POWER": 5, "MANA": 5}
-	Thunder = {"name": "THUNDER", "POWER": 5, "MANA": 5}
+	Fire = {"name": "FIRE", "POWER": 5, "ELEMENT": "FIRE", "MANA": 5}
+	Ice = {"name": "ICE", "POWER": 5, "ELEMENT": "ICE", "MANA": 5}
+	Thunder = {"name": "THUNDER", "POWER": 5, "ELEMENT": "THUNDER", "MANA": 5}
 	Heal = {"name": "HEAL", "POWER": 5, "MANA": 10}
 	spellBook = [Fire, Ice, Thunder]
 	selectedMagic = spellBook[0]
