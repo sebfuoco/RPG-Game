@@ -17,28 +17,32 @@ def loadNextMap(yCoord, xCoord, spawnLocation, Maps):
 
 def detectCollision(self, yCoord, xCoord, mobs):
 	t = self.instr(yCoord, xCoord, 1).decode("utf-8")
-	if t in "X":
-		return "loadMap"
-	elif t in ".":
-		return True
-	elif t in "C":
-		return "Chest"
-	elif t in "M":
-		return "Merchant"
-	elif t in "Q":
-		return "Quest"
-	elif t in "I":
-		return "Information"
-	elif t in mobs:
-		return "Attack"
+	self.refresh()
+	if t != "":  # some Obstructions are empty in linux
+		if t in "X":
+			return "loadMap"
+		elif t in ".":
+			return True
+		elif t in "C":
+			return "Chest"
+		elif t in "M":
+			return "Merchant"
+		elif t in "Q":
+			return "Quest"
+		elif t in "I":
+			return "Information"
+		elif t in mobs:
+			return "Attack"
+	else:
+		return False
 
 def currentPosition(self, yCoord, xCoord, Maps):
 	previousPosition = Maps.currentMap[yCoord][0][xCoord]
 	self.addstr(yCoord, xCoord, previousPosition)
 	self.refresh()
 
-def movePlayer(self, yCoord, xCoord):
-	self.addstr(yCoord, xCoord, "@")
+def movePlayer(self, color_pair, yCoord, xCoord):
+	self.addstr(yCoord, xCoord, "@", color_pair(16))
 	self.refresh()
 	return yCoord, xCoord
 

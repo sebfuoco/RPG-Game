@@ -21,13 +21,16 @@ def initInfo(i):
 class mapNames:
 	townName = "TOWN"
 	homeName = "HOME"
-	neighbour_homeName = "NEIGHBOURS HOME"
+	elders_homeName = "ELDERS HOME"
 	farmName = "FARMS"
 	forestName = "FOREST"
 	townSquareName = "TOWN SQUARE"
 	castleGateName = "CASTLE GATE"
 	fieldName = "FIELD"
 	caveName = "CAVE"
+	westLuciaName = "WEST LUCIA"
+	kingStarPubName = "KING STAR PUB"
+	allMapNames = [townName, homeName, elders_homeName, farmName, forestName, townSquareName, castleGateName, fieldName, caveName, westLuciaName, kingStarPubName]
 
 class Maps:
 	from MapSettings import merchants
@@ -46,7 +49,7 @@ class Maps:
 			["ǁ..#M#..............▒▒▒▒▒▒▒▒▒▒.ǁ"],
 			["ǁ..............................ǁ"],
 			["+==============================+"]]
-	townData = {"1119": mapNames.homeName, "115": mapNames.farmName, "519": mapNames.neighbour_homeName}
+	townData = {"1119": mapNames.homeName, "115": mapNames.farmName, "519": mapNames.elders_homeName}
 	#  yCoord, xCoord, spawnLocation
 	townSpawn = [[1, 15, 1], [5, 19, 0], [11, 19, 0]]
 	allTown = [mapNames.townName, town, townData, townSpawn, None, None, None, None, merchants.townMerchant]
@@ -64,20 +67,20 @@ class Maps:
 	homeChest = initChest(mapNames.homeName)
 	allHome = [mapNames.homeName, home, homeData, homeSpawn, None, homeChest, None, None, None]
 
-	neighbour_home = [["+==============================+"],
-					  ["ǁ##############################ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁX...........................Q#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ#............................#ǁ"],
-					  ["ǁ##############################ǁ"],
-					  ["+==============================+"]]
-	neighbour_homeData = {"42": mapNames.townName}
-	neighbour_homeSpawn = [[4, 2, 1]]
-	neighbour_homeQuest = initQuest(mapNames.neighbour_homeName)
-	allNeighbour = [mapNames.neighbour_homeName, neighbour_home, neighbour_homeData, neighbour_homeSpawn, None, None, neighbour_homeQuest, None, None]
+	elders_home = [["+==============================+"],
+				   ["ǁ##############################ǁ"],
+				   ["ǁ#............................#ǁ"],
+				   ["ǁ#............................#ǁ"],
+				   ["ǁX...........................Q#ǁ"],
+				   ["ǁ#............................#ǁ"],
+				   ["ǁ#............................#ǁ"],
+				   ["ǁ#............................#ǁ"],
+				   ["ǁ##############################ǁ"],
+				   ["+==============================+"]]
+	elders_homeData = {"42": mapNames.townName}
+	elders_homeSpawn = [[4, 2, 1]]
+	elders_homeQuest = initQuest(mapNames.elders_homeName)
+	allElderHome = [mapNames.elders_homeName, elders_home, elders_homeData, elders_homeSpawn, None, None, elders_homeQuest, None, None]
 
 	farm = [["+==============X===============+"],
 			["ǁ*************▒.I##############ǁ"],
@@ -102,16 +105,16 @@ class Maps:
 
 	forest = [["+==============X===============+"],
 			  ["ǁ..............................ǁ"],
-			  ["ǁ.....****...***..........*****ǁ"],
-			  ["ǁ.*****************************ǁ"],
-			  ["ǁ.*****************************ǁ"],
-			  ["ǁ.....****...***..........*****ǁ"],
+			  ["ǁ.....****...**...........*****ǁ"],
+			  ["ǁ.*************.***************ǁ"],
+			  ["ǁ.*************.***************ǁ"],
+			  ["ǁ.....****...**...........*****ǁ"],
 			  ["ǁ..............................ǁ"],
-			  ["ǁ*****************.............ǁ"],
-			  ["ǁ********......*************...ǁ"],
-			  ["ǁ**.........**.********....**..ǁ"],
+			  ["ǁ**************.**.............ǁ"],
+			  ["ǁ********.......************...ǁ"],
+			  ["ǁ**.........**..*******....**..ǁ"],
 			  ["ǁ**.........**.....*****...**..ǁ"],
-			  ["ǁ**.*************..*****...**..ǁ"],
+			  ["ǁ**.***********.*..*****...**..ǁ"],
 			  ["ǁ**.............*..............ǁ"],
 			  ["+==============X===============+"]]
 	forestData = {"115": mapNames.townSquareName, "1215": mapNames.farmName}
@@ -127,7 +130,7 @@ class Maps:
 				  ["ǁ#########............#########ǁ"],
 				  ["ǁ#M#M#M#M#............#I#I#I#Q#ǁ"],
 				  ["ǁ...........▒▒▒▒▒▒▒▒...........ǁ"],
-				  ["X...........▒▒▒..▒▒▒...........X"],
+				  ["X...........▒▒▒˄˄▒▒▒...........X"],
 				  ["ǁ...........▒▒▒▒I▒▒▒...........ǁ"],
 				  ["ǁ..............................ǁ"],
 				  ["ǁ..............................ǁ"],
@@ -135,10 +138,11 @@ class Maps:
 				  ["ǁ..............................ǁ"],
 				  ["ǁ..............................ǁ"],
 				  ["+==============X===============+"]]
-	townSquareData = {"115": mapNames.castleGateName, "71": mapNames.fieldName, "1315": mapNames.forestName}
-	townSquareSpawn = [[1, 15, 1], [7, 1, 1], [7, 30], [13, 15, 0]]
+	townSquareData = {"115": mapNames.castleGateName, "71": mapNames.fieldName, "730": mapNames.westLuciaName, "1315": mapNames.forestName}
+	townSquareSpawn = [[1, 15, 1], [7, 1, 1], [7, 30, 0], [13, 15, 0]]
+	townSquareQuest = initQuest(mapNames.townSquareName)
 	townSquareInfo = initInfo(mapNames.townSquareName)
-	allTownSquare = [mapNames.townSquareName, townSquare, townSquareData, townSquareSpawn, None, None, None, townSquareInfo, merchants.townSquareMerchant]
+	allTownSquare = [mapNames.townSquareName, townSquare, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant]
 
 	castleGate = [["+==============X===============+"],
 				  ["ǁ..............................ǁ"],
@@ -183,10 +187,43 @@ class Maps:
 	caveMobs = initMob(mapNames.caveName)
 	allCave = [mapNames.caveName, cave, caveData, caveSpawn, caveMobs, None, None, None, None]
 
-	allMaps = [allTown, allHome, allNeighbour, allFarm, allForest, allTownSquare, allCastleGate, allField, allCave]
+	westLucia = [["+==============================+"],
+				 ["ǁ..............................ǁ"],
+				 ["ǁ..............................ǁ"],
+				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒....ǁ"],
+				 ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄▒....ǁ"],
+				 ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄▒....ǁ"],
+				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒....ǁ"],
+				 ["X..............................X"],
+				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
+				 ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...X˄˄˄˄˄˄˄˄˄˄˄˄˄▒ǁ"],
+				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
+				 ["+==============================+"]]
+	westLuciaData = {"71": mapNames.townSquareName, "915": mapNames.kingStarPubName}
+	westLuciaSpawn = [[7, 1, 2], [9, 15, 0]]
+	allWestLucia = [mapNames.westLuciaName, westLucia, westLuciaData, westLuciaSpawn, None, None, None, None, None]
+
+	kingStarPub = [["+======================+"],
+				   ["ǁ...▒...▒...▒..........ǁ"],
+				   ["ǁ...▒...▒...▒..........ǁ"],
+				   ["ǁ▒.▒▒▒.▒▒▒.▒▒▒▒▒...▒▒▒▒ǁ"],
+				   ["ǁ......................ǁ"],
+				   ["ǁ......................ǁ"],
+				   ["ǁ▒▒▒▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒ǁ"],
+				   ["X.................▒....ǁ"],
+				   ["ǁ.................I....ǁ"],
+				   ["+======================+"]]
+	kingStarPubData = {"71": mapNames.westLuciaName}
+	kingStarPubSpawn = [[7, 1, 1]]
+	kingStarPubMobs = initMob(mapNames.kingStarPubName)
+	kingStarPubInfo = initInfo(mapNames.kingStarPubName)
+	allKingStarPub = [mapNames.kingStarPubName, kingStarPub, kingStarPubData, kingStarPubSpawn, kingStarPubMobs, None, None, kingStarPubInfo, None]
+
+	# allMap template [mapName, map, mapData, mapSpawn, mapMobs, mapChests, mapQuest, mapInfo, mapMerchants]
+	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allField, allCave, allWestLucia, allKingStarPub]
 
 	quickStartMap = [[town, mapNames.townName, townData, townSpawn, None, None, None, None, merchants.townMerchant],
-					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, None, townSquareInfo, merchants.townSquareMerchant]]
+					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant]]
 	i = 1
 	currentMap = quickStartMap[i][0]
 	currentMapName = quickStartMap[i][1]

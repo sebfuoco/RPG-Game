@@ -43,9 +43,10 @@ class Player(object):
 		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1]]
 		self.Gold = 20
 		self.status = "NORMAL"
+		self.keyItems = {}
 		self.activeQuests = []
 
-	def levelUp(self, screen):
+	def levelUp(self, screen, pos):
 		while self.stats["XP"] >= self.currentStats["MaxXP"]:
 			self.stats["XP"] -= self.currentStats["MaxXP"]
 			self.currentStats["MaxXP"] = round(self.currentStats["MaxXP"] * 1.5)
@@ -57,5 +58,7 @@ class Player(object):
 			self.currentStats["MaxSTR"] += self.nextLevel["STRIncrease"]
 			self.currentStats["MaxMagicSTR"] += self.nextLevel["MagicSTRIncrease"]
 			self.currentStats["MaxSPEED"] += self.nextLevel["SPEEDIncrease"]
-			screen.addstr(16, 35, f"YOU ARE NOW LEVEL {self.currentStats['LEVEL']}")
+			screen.addstr(pos, 35, f"YOU ARE NOW LEVEL {self.currentStats['LEVEL']}")
 
+	# store enemies for quest + save game
+	visitedMap = {}

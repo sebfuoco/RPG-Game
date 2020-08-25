@@ -2,13 +2,21 @@ import MapAction
 import mobs
 from curses import wrapper
 from UI import *
+from UI import clearLog
 from Map import Maps, mapNames
-from MapSettings import merchants
-from ItemsAction import *
+from ItemsAction import *  # Imports Items file as well
 from questAction import quest
 from UIAction import loopInventory, wrapText
 from player import Classes, Player, Magic
 from mobAction import attack
+
+# check OS, Windows works differently than Linux, supporting less colour.
+from sys import platform
+class OS:
+    if platform == "linux":
+        OS = "LINUX"
+    elif platform == "win32":
+        OS = "WINDOWS"
 
 def my_raw_input(screen, r, c, prompt_string, charlength):
     curses.curs_set(1)
@@ -23,15 +31,16 @@ def my_raw_input(screen, r, c, prompt_string, charlength):
     return input
 
 def loadMap(self, yCoord, xCoord, player):
+    player.visitedMap[Maps.currentMapName] = mobs.currentMobLocation.mobLocation
     spawnLocation = MapAction.respawnData(yCoord, xCoord, Maps)
     yCoord, xCoord = MapAction.loadNextMap(yCoord, xCoord, spawnLocation, Maps)
     self.clear()
-    size = mainUI.worldUI(self, player, Maps)
-    mobMap(self, Maps.currentMapMobs, mobs, Maps.currentMap)
-    chestMap(self, Maps.currentMapChest)
+    size = mainUI.worldUI(self, player, Maps, OS.OS)
+    mobMap(self, Maps.currentMapMobs, mobs, Maps.currentMap, OS.OS)
+    chestMap(self, Maps.currentMapChest, OS.OS)
     return yCoord, xCoord, spawnLocation, size
 
-def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
+def move(self, curses, direction, yCoord, xCoord, spawnLocation, player, attackType):
     originalCoord = {"yCoord": yCoord, "xCoord": xCoord}
     if direction == "UP":
         yCoord -= 1
@@ -45,7 +54,7 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
     if x:
         if x == "loadMap":
             yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], player)
-            yCoord, xCoord = MapAction.movePlayer(self, yCoord, xCoord)
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, yCoord, xCoord)
         elif x == "Merchant":
             choice = my_raw_input(self, 12, 35, "BUY OR SELL?", 4).decode("utf-8").upper()
             mainUI.logUI(self)
@@ -82,26 +91,26 @@ def move(self, direction, yCoord, xCoord, spawnLocation, player, attackType):
                         mainUI.clearOptionalUI(self)
                 except ValueError:
                     pass
-            yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Chest":
             mainUI.chestUI(self, yCoord, xCoord, player, Maps, mapNames)
-            yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Quest":
-            mainUI.questUI(self, player, yCoord, xCoord, Maps, mapNames, quest)
-            yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            mainUI.questUI(self, player, yCoord, xCoord, Maps, mapNames, quest, QuestItems)
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
         elif x == "Information":
-            mainUI.informationUI(self, yCoord, xCoord, Maps, mobs)
-            yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            mainUI.informationUI(self, yCoord, xCoord, Maps, mobs, player, QuestItems)
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
             self.refresh()
         elif x == "Attack":
-            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI)
-            yCoord, xCoord = MapAction.movePlayer(self, originalCoord["yCoord"], originalCoord["xCoord"])
+            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI, clearLog)
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
             mainUI.characterUI(self, player)
             self.refresh()
         else:
-            mainUI.clearOptionalUI(self)
+            #mainUI.clearOptionalUI(self)
             MapAction.currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"], Maps)
-            yCoord, xCoord = MapAction.movePlayer(self, yCoord, xCoord)
+            yCoord, xCoord = MapAction.movePlayer(self, curses.color_pair, yCoord, xCoord)
         if player.status == "POISONED":
             player.stats["HP"] -= 1
             mainUI.characterUI(self, player)
@@ -113,24 +122,22 @@ def main(main):
     yCoord = 12
     xCoord = 15
     spawnLocation = 0
-    attackType = "PHYSICAL"
+    attackType = "PHYSICAL" 
     screen = curses.initscr()
     curses.start_color()
     curses.use_default_colors()
-    for i in range(0, 16):
+    for i in range(0, 100):
         curses.init_pair(i + 1, i, 0)
-
     """
-    for i in range(0, 16):
+    for i in range(0, 256):
         screen.addstr(str(i), curses.color_pair(i))
     screen.refresh()
     input = screen.getstr(3, 0, 0)
     """
-
     while True:
         screen.clear()
         screen.addstr(0, 0,
-                      f"1. Warrior | HP: {str(Classes.Warrior.stats['HP'])} MP: {str(Classes.Warrior.stats['MP'])} STR: {str(Classes.Warrior.stats['STR'])} DEF: {str(Classes.Warrior.stats['DEF'])}")
+                f"1. Warrior | HP: {str(Classes.Warrior.stats['HP'])} MP: {str(Classes.Warrior.stats['MP'])} STR: {str(Classes.Warrior.stats['STR'])} DEF: {str(Classes.Warrior.stats['DEF'])}")
         screen.addstr(1, 0,
                       f"2. Mage    | HP: {str(Classes.Mage.stats['HP'])} MP: {str(Classes.Mage.stats['MP'])} STR: {str(Classes.Mage.stats['STR'])} DEF: {str(Classes.Mage.stats['DEF'])}")
         screen.addstr(2, 0,
@@ -153,8 +160,8 @@ def main(main):
             curses.napms(500)
     EquipmentStats(player)
     screen.clear()
-    size = mainUI.worldUI(screen, player, Maps)
-    MapAction.movePlayer(screen, yCoord, xCoord)
+    size = mainUI.worldUI(screen, player, Maps, OS.OS)
+    MapAction.movePlayer(screen, curses.color_pair, yCoord, xCoord)
     curses.noecho()
     screen.move(12, 35)
     screen.refresh()
@@ -171,17 +178,18 @@ def main(main):
             break
         key = screen.getch()
         mainUI.logUI(screen)
+        mainUI.clearOptionalUI(screen)
         if key == curses.KEY_HOME:
             break
         # MOVEMENT
         elif key == curses.KEY_UP:
-            yCoord, xCoord, spawnLocation = move(screen, "UP", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation = move(screen, curses, "UP", yCoord, xCoord, spawnLocation, player, attackType)
         elif key == curses.KEY_DOWN:
-            yCoord, xCoord, spawnLocation = move(screen, "DOWN", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation = move(screen, curses, "DOWN", yCoord, xCoord, spawnLocation, player, attackType)
         elif key == curses.KEY_LEFT:
-            yCoord, xCoord, spawnLocation = move(screen, "LEFT", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation = move(screen, curses, "LEFT", yCoord, xCoord, spawnLocation, player, attackType)
         elif key == curses.KEY_RIGHT:
-            yCoord, xCoord, spawnLocation = move(screen, "RIGHT", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation = move(screen, curses, "RIGHT", yCoord, xCoord, spawnLocation, player, attackType)
         elif key in range(49, 58):  # 1-9
             if player.stats["CLASS"] == "MAGE":
                 try:

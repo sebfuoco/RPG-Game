@@ -19,7 +19,7 @@ def wrapText(addstr, title, text, i, pos, mapUI, location):
 	else:
 		maxPos = pos + 29
 	# TITLE
-	addstr(0, 65, mapUI[0][0])
+	addstr(i-1, 65, mapUI[0][0])
 	addstr(i, 65, mapUI[1][0])
 	if len(title) + 2 <= maxPos:
 		addstr(i, pos, title, A_UNDERLINE)

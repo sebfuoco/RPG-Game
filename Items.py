@@ -51,3 +51,8 @@ class Items:
 	# Throwables
 	HolyWater = {"name": "HOLY WATER", "description": "DEALS 25 HOLY DAMAGE TO ENEMIES, IGNORES DEFENSE", "type": "ITEM", "throwable": True, "price": 50, "damage": 25, "ELEMENT": "HOLY"}
 	ThrowingKnife = {"name": "THROWING KNIFE", "description": "DEALS 10 DAMAGE TO ENEMIES, IGNORES DEFENSE", "type": "ITEM", "throwable": True, "price": 10, "damage": 10}
+
+class QuestItems:
+	letter = {"name": "LETTER", "type": "QUEST"}
+	skeletonKey = {"name": "SKELETON KEY", "type": "QUEST"}
+	royalCoin = {"name": "ROYAL COIN", "type": "QUEST"}
