@@ -1,6 +1,12 @@
 from Items import *
 from curses import napms
 
+def keyItems(item):
+	temp = ""
+	for x in item:
+		temp += f"{x} tab "
+	return temp
+
 def inventoryUse(target, player, addEmpty):
 	temp = []
 	for x in player.Inventory:
@@ -147,11 +153,11 @@ def deleteItem(temp, player, i):
 def EquipmentStats(player):
 	stats = {"STR": 0, "DEF": 0, "EVASION": 0, "SPEED": 0}
 	for key, value in player.equipped.items():
-		stats["STR"] += value["STR"]
-		stats["DEF"] += value["DEF"]
-		if value["type"] == "ARMOUR":
-			stats["EVASION"] += value["EVASION"]
-			stats["SPEED"] += value["SPEED"]
+		for stat in stats:
+			try:
+				stats[stat] += value[stat]
+			except KeyError:
+				pass
 	for stat in stats:
 		if player.stats[stat] + stats[stat] < 0:
 			player.currentStats["Max" + stat] = 0

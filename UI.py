@@ -4,11 +4,11 @@ from UIAction import wrapText, loopInventory
 class mainUI:
 	def worldUI(self, player, Maps, OS):
 		loopMap(Maps.currentMap, self, OS)
-		size = mainUI.mapNameUI(self, Maps.currentMapName)
+		mainUI.mapNameUI(self, Maps.currentMapName)
 		# CHARACTER
-		size = mainUI.characterUI(self, player)
+		mainUI.characterUI(self, player)
 		# INVENTORY
-		size = mainUI.charInventoryUI(self, player)
+		mainUI.charInventoryUI(self, player)
 		# BATTLELOG
 		size = mainUI.logUI(self)
 		return size
@@ -93,25 +93,20 @@ class mainUI:
 			size = False
 		return size
 
-	def spells(self, item):
+	def initWrap(self, item, title):
 		i = 0
-		spell = ""
+		text = ""
 		for x in item:
-			spell += f"{i + 1}. {x['name']}: {x['MANA']} MP "
-			if x != item[-1]:
-				spell += "tab "
+			if title == "INVENTORY":
+				text += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])} "
+				if x[i] != item[0][-1]:
+					text += "tab "
+			else:
+				text += f"{i + 1}. {x['name']}: {x['MANA']} MP "
+				if x != item[-1]:
+					text += "tab "
 			i += 1
-		wrapText(self.addstr, "SPELLS", spell, 1, 67, UI, "SIDE")
-
-	def inventory(self, item):
-		i = 0
-		inventoryItems = ""
-		for x in item:
-			inventoryItems += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])} "
-			if x[i] != item[0][-1]:
-				inventoryItems += "tab "
-			i += 1
-		wrapText(self.addstr, "INVENTORY", inventoryItems, 1, 67, UI, "SIDE")
+		wrapText(self.addstr, title, text, 1, 67, UI, "SIDE")
 
 	def merchantUI(self, yCoord, xCoord, currentMerchant):
 		merchantItems = ""
@@ -192,9 +187,9 @@ class mainUI:
 				if notComplete:
 					self.addstr(i, pos, "QUEST IN PROGRESS")
 			else:
-				wrapText(self.addstr, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][1], i, pos, UI, "SIDE")
+				wrapText(self.addstr, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][2], i, pos, UI, "SIDE")
 				player.activeQuests.append(Maps.currentMapQuest[z][0])
-				startReward = Maps.currentMapQuest[z][0][2][2]["QUESTITEM"]
+				startReward = Maps.currentMapQuest[z][0][3][2]["QUESTITEM"]
 				if startReward[0]["type"] == "QUEST":
 					player.keyItems[startReward[0]["name"]] = startReward[0]
 				else:
@@ -207,13 +202,13 @@ class mainUI:
 		except IndexError:
 			self.addstr(i, pos, "QUEST COMPLETE")
 
-	def informationUI(self, yCoord, xCoord, Maps, mobs, player, QuestItems):
+	def informationUI(self, yCoord, xCoord, Maps, mobs, player, QuestItems, OS):
 		mainUI.clearOptionalUI(self)
 		z = str(str(yCoord) + str(xCoord))
 		i = 1
 		pos = 67
 		try:
-			if Maps.currentMapName == Maps.allFarm[0] and mobs.currentMobLocation.killBoss[mobs.mobList.queenSpider["name"]] and Maps.farmInfo[z][-1] == 1:
+			if Maps.currentMapName == Maps.allFarm[0] and mobs.currentMobLocation.killBoss[mobs.mobList.queenSpider["name"]] and Maps.farmInfo[z][-1] == 2:
 				Maps.farmInfo[z][-1] += 1
 			elif Maps.currentMapName == Maps.allTownSquare[0] and player.keyItems[QuestItems.letter["name"]]:
 				Maps.townSquareInfo[z][-1] += 1
@@ -222,8 +217,17 @@ class mainUI:
 				wrapText(self.addstr, Maps.currentMapInfo[z][0], Maps.currentMapInfo[z][j], i, pos, UI, "SIDE")
 				Maps.townSquareInfo[z][-1] += 1
 				return
-			elif Maps.currentMapName == Maps.allKingStarPub[0] and not mobs.currentMobLocation.mobLocation and Maps.kingStarPubInfo[z][-1] == 1:
+			elif Maps.currentMapName == Maps.allKingStarPub[0] and not mobs.currentMobLocation.mobLocation and Maps.kingStarPubInfo[z][-1] == 2:
 				Maps.kingStarPubInfo[z][-1] += 1
+			elif Maps.currentMapName == Maps.allCastleGate[0] and player.keyItems[QuestItems.royalCoin["name"]]:
+				del player.keyItems[QuestItems.royalCoin["name"]]
+				Maps.allCastleGate[7][z][-1] += 1
+				Maps.allCastleGate[7][z][1][1] -= 1
+				Maps.allCastleGate[7]["414"] = Maps.allCastleGate[7][z]
+				del Maps.allCastleGate[7][z]
+				loopMap(Maps.currentMap, self, OS)
+				initEntity(self, Maps.castleGateInfo, OS, "I")
+				return
 		except KeyError:
 			pass
 		j = Maps.currentMapInfo[z][-1]
@@ -249,14 +253,14 @@ def loopMap(item, screen, OS):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(11))
 				elif item[col][0][row] in "M":
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(12))
-				elif item[col][0][row] in ("˄", "^", "Q", "I"):
+				elif item[col][0][row] in ("˄", "^"):
 					if OS == "LINUX":
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(4))
 					else:
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
-				elif item[col][0][row] in "~":  # Obstructions not coloured
+				elif item[col][0][row] in (" ", "~"):  # Obstructions not coloured
 					if OS == "LINUX":
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(7) | curses.A_REVERSE)
 					else:
@@ -271,7 +275,21 @@ def loopMap(item, screen, OS):
 		size = False
 		return size
 
-def mobMap(self, currentMapMobs, mobs, currentMap, OS):
+def initEntity(self, entity, OS, char):
+	try:
+		for key in entity:
+			if char == "I":
+				target = entity[key][1]
+			else:
+				target = entity[key][0][1]
+			if OS == "LINUX":
+				self.addstr(target[0], target[1], char, curses.color_pair(4))
+			else:
+				self.addstr(target[0], target[1], char, curses.color_pair(7))
+	except TypeError:
+		pass
+
+def mobMap(self, currentMapMobs, mobs, currentMap, currentMapInfo, currentMapQuest, OS):
 	try:
 		i = 0
 		mobs.currentMobLocation.mobLocation = []
@@ -290,6 +308,8 @@ def mobMap(self, currentMapMobs, mobs, currentMap, OS):
 					i += 1
 	except TypeError:
 		pass
+	initEntity(self, currentMapInfo, OS, "I")
+	initEntity(self, currentMapQuest, OS, "Q")
 
 def chestMap(self, currentMapChest, OS):
 	try:

@@ -1,4 +1,4 @@
-from Items import Equipment, Items
+from Items import Equipment, Items, QuestItems
 
 class Magic:
 	Fire = {"name": "FIRE", "POWER": 5, "ELEMENT": "FIRE", "MANA": 5}
@@ -43,7 +43,7 @@ class Player(object):
 		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1]]
 		self.Gold = 20
 		self.status = "NORMAL"
-		self.keyItems = {}
+		self.keyItems = {QuestItems.royalCoin["name"]: QuestItems.royalCoin}
 		self.activeQuests = []
 
 	def levelUp(self, screen, pos):
