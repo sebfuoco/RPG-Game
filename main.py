@@ -2,13 +2,12 @@ import MapAction
 import mobs
 from curses import wrapper
 from UI import *
-from UI import clearLog
 from Map import Maps, mapNames
 from ItemsAction import *  # Imports Items file as well
 from questAction import quest
-from UIAction import loopInventory, wrapText
+from UIAction import loopInventory, wrapText, newLine
 from player import Classes, Player, Magic
-from mobAction import attack
+from mobAction import attack, mobMove
 
 # check OS, Windows works differently than Linux, supporting less colour.
 from sys import platform
@@ -35,11 +34,11 @@ def loadMap(self, yCoord, xCoord, player):
     yCoord, xCoord = MapAction.loadNextMap(yCoord, xCoord, spawnLocation, Maps)
     self.clear()
     size = mainUI.worldUI(self, player, Maps, OS.OS)
-    mobMap(self, Maps.currentMapMobs, mobs, Maps.currentMap, Maps.currentMapInfo, Maps.currentMapQuest, OS.OS)
+    entityMap(self, Maps.currentMapMobs, mobs, Maps.currentMap, Maps.currentMapInfo, Maps.currentMapQuest, Maps.currentMapMerchant, OS.OS)
     chestMap(self, Maps.currentMapChest, OS.OS)
     return yCoord, xCoord, spawnLocation, size
 
-def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, attackType):
+def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, attackType, mobCounter):
     originalCoord = {"yCoord": yCoord, "xCoord": xCoord}
     if direction == "UP":
         yCoord -= 1
@@ -53,7 +52,7 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
     if x:
         if x == "loadMap":
             yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], player)
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, yCoord, xCoord)
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, yCoord, xCoord, "@", 16)
         elif x == "Merchant":
             choice = my_raw_input(self, 12, 35, "BUY OR SELL?", 4).decode("utf-8").upper()
             mainUI.logUI(self)
@@ -90,36 +89,42 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
                         mainUI.clearOptionalUI(self)
                 except ValueError:
                     pass
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
         elif x == "Chest":
-            mainUI.chestUI(self, yCoord, xCoord, player, Maps, mapNames)
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
+            mainUI.chestUI(self, yCoord, xCoord, player, Maps)
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
         elif x == "Quest":
             mainUI.questUI(self, player, yCoord, xCoord, Maps, mapNames, quest, QuestItems)
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
         elif x == "Information":
             mainUI.informationUI(self, yCoord, xCoord, Maps, mobs, player, QuestItems, OS.OS)
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
             self.refresh()
         elif x == "Attack":
-            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI, clearLog)
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"])
+            attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI, newLine)
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
             mainUI.characterUI(self, player)
             self.refresh()
         else:
-            MapAction.currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"], Maps)
-            yCoord, xCoord = MapAction.movePlayer(self, color_pair, yCoord, xCoord)
+            MapAction.currentPosition(self, originalCoord["yCoord"], originalCoord["xCoord"], Maps.currentMap)
+            yCoord, xCoord = MapAction.moveEntity(self, color_pair, yCoord, xCoord, "@", 16)
+            if mobCounter == 0:
+                mobMove(self, player, mobs.currentMobLocation.mobLocation, Maps.currentMapMobs, Maps.currentMap, MapAction.currentPosition,
+                        MapAction.moveEntity, MapAction.detectCollision, OS.OS, curses.color_pair, yCoord, xCoord)
+            elif mobCounter == 1:
+                mobCounter = 0
         if player.status == "POISONED":
             player.stats["HP"] -= 1
             mainUI.characterUI(self, player)
     else:
-        return originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation
-    return yCoord, xCoord, spawnLocation
+        return originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation, mobCounter
+    return yCoord, xCoord, spawnLocation, mobCounter
 
 def main(main):
-    yCoord = 12
+    yCoord = 9
     xCoord = 15
     spawnLocation = 0
+    mobCounter = 0  # go to 1 and then reset to 0
     attackType = "PHYSICAL" 
     screen = curses.initscr()
     curses.start_color()
@@ -159,13 +164,11 @@ def main(main):
     EquipmentStats(player)
     screen.clear()
     size = mainUI.worldUI(screen, player, Maps, OS.OS)
-    MapAction.movePlayer(screen, curses.color_pair, yCoord, xCoord)
-    mobMap(screen, Maps.currentMapMobs, mobs, Maps.currentMap, Maps.currentMapInfo, Maps.currentMapQuest, OS.OS)
+    MapAction.moveEntity(screen, curses.color_pair, yCoord, xCoord, "@", 16)
+    entityMap(screen, Maps.currentMapMobs, mobs, Maps.currentMap, Maps.currentMapInfo, Maps.currentMapQuest, Maps.currentMapMerchant, OS.OS)
     curses.noecho()
     screen.move(12, 35)
     screen.refresh()
-    # findPos(yCoord, xCoord)
-    # choice = my_raw_input(screen, 12, 35, "Action?", 10).upper().decode("utf-8")
     while size:
         player.visitedMap[Maps.currentMapName] = mobs.currentMobLocation.mobLocation
         curses.curs_set(0)
@@ -183,13 +186,13 @@ def main(main):
             break
         # MOVEMENT
         elif key == curses.KEY_UP:
-            yCoord, xCoord, spawnLocation = move(screen, curses.color_pair, "UP", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation, mobCounter = move(screen, curses.color_pair, "UP", yCoord, xCoord, spawnLocation, player, attackType, mobCounter)
         elif key == curses.KEY_DOWN:
-            yCoord, xCoord, spawnLocation = move(screen, curses.color_pair, "DOWN", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation, mobCounter = move(screen, curses.color_pair, "DOWN", yCoord, xCoord, spawnLocation, player, attackType, mobCounter)
         elif key == curses.KEY_LEFT:
-            yCoord, xCoord, spawnLocation = move(screen, curses.color_pair, "LEFT", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation, mobCounter = move(screen, curses.color_pair, "LEFT", yCoord, xCoord, spawnLocation, player, attackType, mobCounter)
         elif key == curses.KEY_RIGHT:
-            yCoord, xCoord, spawnLocation = move(screen, curses.color_pair, "RIGHT", yCoord, xCoord, spawnLocation, player, attackType)
+            yCoord, xCoord, spawnLocation, mobCounter = move(screen, curses.color_pair, "RIGHT", yCoord, xCoord, spawnLocation, player, attackType, mobCounter)
         elif key in range(49, 58):  # 1-9
             if player.stats["CLASS"] == "MAGE":
                 try:

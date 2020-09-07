@@ -35,6 +35,7 @@ class mainUI:
 
 	def charInventoryUI(self, player):
 		try:
+			# 29 width
 			charInv = [["+-----------------------------+"],
 					   ["|                             |"],
 					   ["|                             |"],
@@ -45,9 +46,10 @@ class mainUI:
 			i = 4
 			pos = 33
 			loopUI(i, pos, charInv, self.addstr)
-			self.addstr(5, 35,
-						f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}     GOLD: {str(player.Gold)}",
-						curses.A_UNDERLINE)
+			text = f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])} GOLD: {str(player.Gold)}"
+			whitespace = 28 - len(text)
+			orgText = f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}" + whitespace*" " + f"GOLD: {str(player.Gold)}"
+			self.addstr(5, 35, f"{orgText}", curses.A_UNDERLINE)
 			self.addstr(6, 35, f"HEAD: {player.equipped['HEAD']['name']}")
 			self.addstr(7, 35, f"CHEST: {player.equipped['CHEST']['name']}")
 			self.addstr(8, 35, f"LEFT-HAND: {player.equipped['LEFT-HAND']['name']}")
@@ -112,7 +114,7 @@ class mainUI:
 		merchantItems = ""
 		i = 0
 		z = str(str(yCoord) + str(xCoord))
-		for j in currentMerchant[z]:
+		for j in currentMerchant[z][0]:
 			i += 1
 			if j["type"] == "ARMOUR":
 				merchantItems += f" {i}. {j['name']} DEF: {str(j['DEF'])} PRICE: {str(j['price'])} "
@@ -129,19 +131,15 @@ class mainUI:
 		wrapText(self.addstr, "FOR SALE", merchantItems, 1, 67, UI, "SIDE")
 		return amount
 
-	def chestToInventory(self, newItem, key, x, Maps, mapNames):
-		if Maps.currentMapName == mapNames.homeName:
-			self.addstr(newItem[x][0], newItem[x][1], ".")
-			del Maps.homeChest[key][x]
-			if len(Maps.homeChest[key]) == 1:
-				del Maps.homeChest[key]
-		elif Maps.currentMapName == mapNames.forestName:
-			self.addstr(newItem[x][0], newItem[x][1], ".")
-			del Maps.forestChest[key][x]
-			if len(Maps.forestChest[key]) == 1:
-				del Maps.forestChest[key]
+	def chestToInventory(self, newItem, key, x, Maps):
+		for name in Maps.allMaps:
+			if Maps.currentMapName == name[0]:
+				self.addstr(newItem[x][0], newItem[x][1], ".")
+				del name[5][key][x]
+				if len(name[5][key]) == 1:
+					del name[5][key]
 
-	def chestUI(self, yCoord, xCoord, player, Maps, mapNames):
+	def chestUI(self, yCoord, xCoord, player, Maps):
 		z = str(str(yCoord) + str(xCoord))
 		i = 0
 		pos = 65
@@ -153,24 +151,40 @@ class mainUI:
 				while x < len(Maps.currentMapChest[key]):
 					zChest = str(str(Maps.currentMapChest[key][x][0]) + str(Maps.currentMapChest[key][x][1]))
 					if zChest == z:
-						wrapText(self.addstr, "CHEST CONTAINS", Maps.currentMapChest[key][x - 1]['name'], 1, 67, UI, "LOG")
-						item = [player.Inventory for x in player.Inventory]
-						if len(item) == 0:
-							player.Inventory.append([Maps.currentMapChest[key][0], 1])
-							mainUI.chestToInventory(self, Maps.currentMapChest[key], key, x, Maps, mapNames)
+						if Maps.currentMapChest[key][0]['type'] == "QUEST":
+							wrapText(self.addstr, "CHEST CONTAINS", Maps.currentMapChest[key][x - 1]['name'], 1, 67, UI,
+									 "LOG")
+							player.keyItems[Maps.currentMapChest[key][0]['name']] = Maps.currentMapChest[key][0]
+							mainUI.chestToInventory(self, Maps.currentMapChest[key], key, x, Maps)
+							return
+						elif Maps.currentMapChest[key][0]['name'] == "GOLD":
+							text = f"{Maps.currentMapChest[key][2]} {Maps.currentMapChest[key][x - 1]['name']}"
+							wrapText(self.addstr, "CHEST CONTAINS", text, 1, 67, UI,
+									 "LOG")
+							player.Gold += Maps.currentMapChest[key][2]
+							mainUI.chestToInventory(self, Maps.currentMapChest[key], key, x, Maps)
+							mainUI.charInventoryUI(self, player)
 							return
 						else:
-							for _ in item:
-								newItem = Maps.currentMapChest[key]
-								if player.Inventory[j].count(Maps.currentMapChest[key][0]) >= 1:
-									player.Inventory[j][1] += 1
-									mainUI.chestToInventory(self, newItem, key, x, Maps, mapNames)
-									return
-								j += 1
-								if j == len(player.Inventory):
-									player.Inventory.append([newItem[0], 1])
-									mainUI.chestToInventory(self, newItem, key, x, Maps, mapNames)
-									return
+							wrapText(self.addstr, "CHEST CONTAINS", Maps.currentMapChest[key][x - 1]['name'], 1, 67, UI,
+									 "LOG")
+							item = [player.Inventory for x in player.Inventory]
+							if len(item) == 0:
+								player.Inventory.append([Maps.currentMapChest[key][0], 1])
+								mainUI.chestToInventory(self, Maps.currentMapChest[key], key, x, Maps)
+								return
+							else:
+								for _ in item:
+									newItem = Maps.currentMapChest[key]
+									if player.Inventory[j].count(Maps.currentMapChest[key][0]) >= 1:
+										player.Inventory[j][1] += 1
+										mainUI.chestToInventory(self, newItem, key, x, Maps)
+										return
+									j += 1
+									if j == len(player.Inventory):
+										player.Inventory.append([newItem[0], 1])
+										mainUI.chestToInventory(self, newItem, key, x, Maps)
+										return
 					x += 1
 		except KeyError:
 			pass
@@ -226,7 +240,7 @@ class mainUI:
 				Maps.allCastleGate[7]["414"] = Maps.allCastleGate[7][z]
 				del Maps.allCastleGate[7][z]
 				loopMap(Maps.currentMap, self, OS)
-				initEntity(self, Maps.castleGateInfo, OS, "I")
+				initEntity(self, Maps.castleGateInfo, OS, "I", 4)
 				return
 		except KeyError:
 			pass
@@ -260,7 +274,7 @@ def loopMap(item, screen, OS):
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
-				elif item[col][0][row] in (" ", "~"):  # Obstructions not coloured
+				elif item[col][0][row] in (" ", "~"):
 					if OS == "LINUX":
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(7) | curses.A_REVERSE)
 					else:
@@ -275,21 +289,24 @@ def loopMap(item, screen, OS):
 		size = False
 		return size
 
-def initEntity(self, entity, OS, char):
+def initEntity(self, entity, OS, char, colour):
+	target = ""
 	try:
 		for key in entity:
 			if char == "I":
 				target = entity[key][1]
-			else:
+			elif char == "Q":
 				target = entity[key][0][1]
+			elif char == "M":
+				target = entity[key][1]
 			if OS == "LINUX":
-				self.addstr(target[0], target[1], char, curses.color_pair(4))
+				self.addstr(target[0], target[1], char, curses.color_pair(colour))
 			else:
-				self.addstr(target[0], target[1], char, curses.color_pair(7))
+				self.addstr(target[0], target[1], char, curses.color_pair(colour + 3))
 	except TypeError:
 		pass
 
-def mobMap(self, currentMapMobs, mobs, currentMap, currentMapInfo, currentMapQuest, OS):
+def initMob(self, currentMapMobs, mobs, currentMap, OS):
 	try:
 		i = 0
 		mobs.currentMobLocation.mobLocation = []
@@ -297,7 +314,10 @@ def mobMap(self, currentMapMobs, mobs, currentMap, currentMapInfo, currentMapQue
 			if key in mobs.mobIcons.mobs:  # MOBS
 				for item in currentMapMobs[key]:
 					if currentMap[item[0]][0][item[1]] == ".":
-						mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1]]]
+						try:
+							mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1], item[2]]]
+						except IndexError:
+							mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1], False]]
 						if mobs.currentMobLocation.mobLocation[i][0]["type"] == "BOSS":
 							self.addstr(item[0], item[1], key, curses.color_pair(6))
 						else:
@@ -308,8 +328,12 @@ def mobMap(self, currentMapMobs, mobs, currentMap, currentMapInfo, currentMapQue
 					i += 1
 	except TypeError:
 		pass
-	initEntity(self, currentMapInfo, OS, "I")
-	initEntity(self, currentMapQuest, OS, "Q")
+
+def entityMap(self, currentMapMobs, mobs, currentMap, currentMapInfo, currentMapQuest, currentMapMerchant, OS):
+	initMob(self, currentMapMobs, mobs, currentMap, OS)
+	initEntity(self, currentMapInfo, OS, "I", 4)
+	initEntity(self, currentMapQuest, OS, "Q", 4)
+	initEntity(self, currentMapMerchant, OS, "M", 9)
 
 def chestMap(self, currentMapChest, OS):
 	try:

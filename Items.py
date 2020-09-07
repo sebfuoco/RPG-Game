@@ -48,6 +48,7 @@ class Equipment:
 	Rapier = {"name": "RAPIER", "type": "WEAPON", "rarity": "NORMAL", "price": 40, "equipLocation": "HAND",
 			  "equipClass": ("THIEF",), "STR": 7}
 class Items:
+	Gold = {"name": "GOLD", "type": "GOLD"}
 	HealthPotion = {"name": "HEALTH POTION", "description": f"HEALS 20 HEALTH", "type": "ITEM", "throwable": False, "price": 10, "heal": 20}
 	SuperHealthPotion = {"name": "S-HEALTH POTION", "description": f"HEALS 50 HEALTH", "type": "ITEM", "throwable": False, "price": 30, "heal": 50}
 	ManaPotion = {"name": "MANA POTION", "description": "HEALS 20 MANA", "type": "ITEM", "throwable": False, "price": 20, "heal": 20}

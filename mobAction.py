@@ -1,5 +1,43 @@
 import random
+import mobs
+from player import Magic
 import math
+
+def mobMove(self, player, mobLocation, currentMapMobs, currentMap, currentPosition, moveEntity, detectCollision, OS, color_pair, yCoord, xCoord):
+	beforeMob = ""
+	i = 0
+	for mob in mobLocation:
+		currentMob = mob[0]
+		if currentMob != beforeMob:
+			i = 0
+		if (abs(mob[1] - yCoord) or abs(mob[2] - xCoord) > 2) and mob[3] is False:  # check distance between mob and player
+			if mob[0]["name"] != "SOLDIER" and mob[0]["type"] != "BOSS":
+				number = random.randrange(0, 4)
+				originalLocation = [mob[1], mob[2]]
+				if number == 0 and mob[1] != 1:  # UP
+					mob[1] -= 1
+				elif number == 1 and mob[1] != (len(currentMap) - 2):  # DOWN
+					mob[1] += 1
+				elif number == 2 and mob[2] != 1:  # LEFT
+					mob[2] -= 1
+				elif number == 3 and mob[2] != (len(currentMap[0][0]) - 1):  # RIGHT
+					mob[2] += 1
+				x = detectCollision(self, mob[1], mob[2], mobs.mobIcons.mobs)
+				if x and x not in ("loadMap", "Chest", "Merchant", "Quest", "Information", "Attack", "Player"):
+					currentPosition(self, currentMapMobs[mob[0]["ICON"]][i][0], currentMapMobs[mob[0]["ICON"]][i][1], currentMap)
+					currentMapMobs[mob[0]["ICON"]][i][0] = mob[1]
+					currentMapMobs[mob[0]["ICON"]][i][1] = mob[2]
+					colour = 2
+					if OS == "WINDOWS":
+						colour = 5
+					moveEntity(self, color_pair, mob[1], mob[2], mob[0]["ICON"], colour)
+				elif x == "Player":
+					mobAttack(self, player, i, "MOB", mobLocation)
+				else:
+					mob[1] = originalLocation[0]
+					mob[2] = originalLocation[1]
+		beforeMob = mob[0]
+		i += 1
 
 def mobAttack(self, player, x, order, mobLocation):
 	mobDamage = mobLocation[x][0]['STR'] - player.currentStats['MaxDEF']
@@ -27,11 +65,14 @@ def mobAttack(self, player, x, order, mobLocation):
 		self.addstr(13, 35, f"{mobLocation[x][0]['name']} MISSED")
 	self.refresh()
 
-def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, clearLog):
+def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, newLine):
 	if attackType == "MAGIC":
-		if (player.stats["MP"] - player.Magic.selectedMagic["MANA"]) >= 0:
-			playerDamage = math.floor(player.currentStats["MaxMagicSTR"] * player.Magic.selectedMagic["POWER"]) - currentMobLocation.mobLocation[x][0]["DEF"]
-			player.stats["MP"] -= player.Magic.selectedMagic["MANA"]
+		if (player.stats["MP"] - Magic.selectedMagic["MANA"]) >= 0:
+			playerDamage = math.floor(player.currentStats["MaxMagicSTR"] * Magic.selectedMagic["POWER"])
+			if Magic.selectedMagic["ELEMENT"] == currentMobLocation.mobLocation[x][0]["weakness"]:
+				playerDamage *= 2
+				print(playerDamage)
+			player.stats["MP"] -= Magic.selectedMagic["MANA"]
 		else:
 			playerDamage = player.currentStats["MaxSTR"] - currentMobLocation.mobLocation[x][0]["DEF"]
 	else:
@@ -40,22 +81,20 @@ def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, Ma
 		playerDamage = 0
 	currentMobLocation.mobLocation[x][0]["HP"] -= playerDamage
 	if order == "PLAYER":
-		pos = 12
+		y = 12
 	else:
-		pos = 13
-	self.addstr(pos, 35, f"DEALT {playerDamage} DAMAGE TO {currentMobLocation.mobLocation[x][0]['name']}")
+		y = 13
 	if currentMobLocation.mobLocation[x][0]["HP"] <= 0:
 		if currentMobLocation.mobLocation[x][0]['type'] == "BOSS":
 			currentMobLocation.killBoss[currentMobLocation.mobLocation[x][0]['name']] = True
-		self.addstr(pos, 35, clearLog)
-		self.addstr(pos, 35, f"{currentMobLocation.mobLocation[x][0]['name']} KILLED!")
-		self.addstr(pos + 1, 35,
+		self.addstr(y, 35, f"{currentMobLocation.mobLocation[x][0]['name']} KILLED!")
+		self.addstr(y + 1, 35,
 					f"{currentMobLocation.mobLocation[x][0]['XP']} XP AND {currentMobLocation.mobLocation[x][0]['GOLD']} GOLD GAINED!")
 		player.stats["XP"] += currentMobLocation.mobLocation[x][0]['XP']
 		player.Gold += currentMobLocation.mobLocation[x][0]['GOLD']
 		kill = currentMobLocation.mobLocation[x][0]['ICON']
 		if player.currentStats != 100:
-			player.levelUp(self, pos + 2)
+			player.levelUp(self, y + 2)
 		del currentMobLocation.mobLocation[x]
 		self.addstr(yCoord, xCoord, ".")
 		self.refresh()
@@ -63,8 +102,13 @@ def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, Ma
 			MapAction.mobKill(kill, i[1], i[2], Maps)
 			charInventoryUI(self, player)
 			return True
+	else:
+		text = f"DEALT {playerDamage} DAMAGE TO {currentMobLocation.mobLocation[x][0]['name']}"
+		pos = 35
+		newLine(text, self.addstr, y, pos + 30, pos, pos, [[""], [""]])
+		self.refresh()
 
-def attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, clearLog):
+def attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, newLine):
 	x = 0
 	z = str(str(yCoord) + str(xCoord))
 	for i in currentMobLocation.mobLocation:
@@ -72,7 +116,7 @@ def attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, currentMob
 		if zMob == z:
 			if player.currentStats["MaxSPEED"] >= currentMobLocation.mobLocation[x][0]["SPEED"]:
 				order = "PLAYER"
-				death = playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, clearLog)
+				death = playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, newLine)
 				if death:
 					break
 				mobAttack(self, player, x, order, currentMobLocation.mobLocation)
@@ -81,5 +125,5 @@ def attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, currentMob
 				death = mobAttack(self, player, x, order, currentMobLocation.mobLocation)
 				if death:
 					break
-				playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, clearLog)
+				playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, MapAction, currentMobLocation, charInventoryUI, newLine)
 		x += 1

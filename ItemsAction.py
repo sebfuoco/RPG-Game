@@ -29,8 +29,8 @@ def sellItem(self, number, amount, player, charInventoryUI, logUI):
 
 def buyItem(self, number, amount, player, z, currentMerchant, loopInventory, clearOptionalUI):
 	try:
-		if (currentMerchant[z][number]["price"] * amount) <= player.Gold:
-			loopInventory(player, currentMerchant[z][number], amount)
+		if (currentMerchant[z][0][number]["price"] * amount) <= player.Gold:
+			loopInventory(player, currentMerchant[z][0][number], amount)
 		else:
 			clearOptionalUI(self)
 			self.addstr(0, 66, "NOT ENOUGH GOLD")

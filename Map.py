@@ -26,11 +26,14 @@ class mapNames:
 	forestName = "FOREST"
 	townSquareName = "TOWN SQUARE"
 	castleGateName = "CASTLE GATE"
+	castleName = "CASTLE"
+	castleBasementName = "CASTLE BASEMENT"
+	castleThroneName = "THRONE ROOM"
 	fieldName = "FIELD"
 	caveName = "CAVE"
 	westLuciaName = "WEST LUCIA"
 	kingStarPubName = "KING STAR PUB"
-	allMapNames = [townName, homeName, elders_homeName, farmName, forestName, townSquareName, castleGateName, fieldName, caveName, westLuciaName, kingStarPubName]
+	allMapNames = [townName, homeName, elders_homeName, farmName, forestName, townSquareName, castleGateName, castleName, fieldName, caveName, westLuciaName, kingStarPubName]
 
 class Maps:
 	from MapSettings import merchants
@@ -38,15 +41,15 @@ class Maps:
 			["ǁ..............................ǁ"],
 			["ǁ..###..............▒▒▒▒▒▒▒▒▒▒.ǁ"],
 			["ǁ..#˄#..............▒˄˄˄˄˄˄˄˄▒.ǁ"],
-			["ǁ..#M#..............▒˄˄˄˄˄˄˄˄▒.ǁ"],
+			["ǁ..#.#..............▒˄˄˄˄˄˄˄˄▒.ǁ"],
 			["ǁ...................X˄˄˄˄˄˄˄˄▒.ǁ"],
 			["ǁ..###..............▒˄˄˄˄˄˄˄˄▒.ǁ"],
 			["ǁ..#˄#..............▒▒▒▒▒▒▒▒▒▒.ǁ"],
-			["ǁ..#M#.........................ǁ"],
+			["ǁ..#.#.........................ǁ"],
 			["ǁ...................▒▒▒▒▒▒▒▒▒▒.ǁ"],
 			["ǁ..###..............▒˄˄˄˄˄˄˄˄▒.ǁ"],
 			["ǁ..#˄#..............X˄˄˄˄˄˄˄˄▒.ǁ"],
-			["ǁ..#M#..............▒▒▒▒▒▒▒▒▒▒.ǁ"],
+			["ǁ..#.#..............▒▒▒▒▒▒▒▒▒▒.ǁ"],
 			["ǁ..............................ǁ"],
 			["+==============================+"]]
 	townData = {"1119": mapNames.homeName, "115": mapNames.farmName, "519": mapNames.elders_homeName}
@@ -106,15 +109,15 @@ class Maps:
 	forest = [["+==============X===============+"],
 			  ["ǁ..............................ǁ"],
 			  ["ǁ.....****...**...........*****ǁ"],
-			  ["ǁ.*************.***************ǁ"],
-			  ["ǁ.*************.***************ǁ"],
+			  ["ǁ.*****************************ǁ"],
+			  ["ǁ.*****************************ǁ"],
 			  ["ǁ.....****...**...........*****ǁ"],
 			  ["ǁ..............................ǁ"],
-			  ["ǁ**************.**.............ǁ"],
+			  ["ǁ*****************.............ǁ"],
 			  ["ǁ********.......************...ǁ"],
 			  ["ǁ**.........**..*******....**..ǁ"],
 			  ["ǁ**.........**.....*****...**..ǁ"],
-			  ["ǁ**.***********.*..*****...**..ǁ"],
+			  ["ǁ**.*************..*****...**..ǁ"],
 			  ["ǁ**.............*..............ǁ"],
 			  ["+==============X===============+"]]
 	forestData = {"115": mapNames.townSquareName, "1215": mapNames.farmName}
@@ -128,7 +131,7 @@ class Maps:
 				  ["ǁ#.#.#.#.#............#.#.#.#.#ǁ"],
 				  ["ǁ..............................ǁ"],
 				  ["ǁ#########............#########ǁ"],
-				  ["ǁ#M#M#M#M#............#.#.#.#.#ǁ"],
+				  ["ǁ#.#.#.#.#............#.#.#.#.#ǁ"],
 				  ["ǁ...........▒▒▒▒▒▒▒▒...........ǁ"],
 				  ["X...........▒▒▒˄˄▒▒▒...........X"],
 				  ["ǁ...........▒▒▒▒.▒▒▒...........ǁ"],
@@ -153,10 +156,40 @@ class Maps:
 				  ["ǁ             ...              ǁ"],
 				  ["ǁ             ...              ǁ"],
 				  ["+==============X===============+"]]
-	castleGateData = {"715": mapNames.townSquareName}
-	castleGateSpawn = [[1, 15], [7, 15, 0]]
+	castleGateData = {"115": mapNames.castleName, "715": mapNames.townSquareName}
+	castleGateSpawn = [[1, 15, 2], [7, 15, 0]]
 	castleGateInfo = initInfo(mapNames.castleGateName)
 	allCastleGate = [mapNames.castleGateName, castleGate, castleGateData, castleGateSpawn, None, None, None, castleGateInfo, None]
+
+	castle = [["+==============X===============+"],
+			  ["ǁ............▒...▒.............ǁ"],
+			  ["ǁ..............................ǁ"],
+			  ["ǁ............▒...▒.............ǁ"],
+			  ["ǁ..............................ǁ"],
+			  ["ǁ............▒...▒.........▒▒.▒ǁ"],
+			  ["ǁ..........................▒▒X▒ǁ"],
+			  ["ǁ............▒...▒.........▒▒▒▒ǁ"],
+			  ["+==============X===============+"]]
+	castleData = {"115": mapNames.castleThroneName, "529": mapNames.castleBasementName, "715": mapNames.castleGateName}
+	castleSpawn = [[1, 15, 0], [5, 29, 0], [7, 15, 0]]
+	castleMobs = initMob(mapNames.castleName)
+	allCastle = [mapNames.castleName, castle, castleData, castleSpawn, castleMobs, None, None,
+					 None, None]
+
+	castleBasement = [["+=================+"],
+					  ["ǁ.▒..▒..▒..▒..▒▒▒▒ǁ"],
+					  ["ǁ.............▒▒X▒ǁ"],
+					  ["ǁ.............▒▒.▒ǁ"],
+					  ["ǁ▒▒▒▒▒▒▒▒▒▒▒..▒..▒ǁ"],
+					  ["ǁ.................ǁ"],
+					  ["ǁ.................ǁ"],
+					  ["ǁ.▒..▒..▒..▒..▒..▒ǁ"],
+					  ["+=================+"]]
+	castleBasementData = {"316": mapNames.castleName}
+	castleBasementSpawn = [[3, 16, 1]]
+	castleBasementChest = initChest(mapNames.castleBasementName)
+	allCastleBasement = [mapNames.castleBasementName, castleBasement, castleBasementData, castleBasementSpawn, None, castleBasementChest, None,
+				 None, None]
 
 	field = [["+==============================+"],
 			 ["ǁ................*.*.*.*.......ǁ"],
@@ -220,10 +253,11 @@ class Maps:
 	allKingStarPub = [mapNames.kingStarPubName, kingStarPub, kingStarPubData, kingStarPubSpawn, kingStarPubMobs, None, None, kingStarPubInfo, None]
 
 	# allMap template [mapName, map, mapData, mapSpawn, mapMobs, mapChests, mapQuest, mapInfo, mapMerchants]
-	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allField, allCave, allWestLucia, allKingStarPub]
+	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allCastle, allCastleBasement, allField, allCave, allWestLucia, allKingStarPub]
 
 	quickStartMap = [[town, mapNames.townName, townData, townSpawn, None, None, None, None, merchants.townMerchant],
-					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant]]
+					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant],
+					 [castle, mapNames.castleName, castleData, castleSpawn, castleMobs, None, None, None, None]]
 	i = 1
 	currentMap = quickStartMap[i][0]
 	currentMapName = quickStartMap[i][1]

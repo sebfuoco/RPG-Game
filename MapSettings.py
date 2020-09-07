@@ -46,23 +46,26 @@ class info:
 	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo, mapNames.kingStarPubName: kingStarPubInfo}
 
 class merchants:
-	townMerchant = {"44": (Equipment.Knife, Equipment.Dagger),
-					"84": (Equipment.LeatherArmour, Equipment.LeatherShield, Equipment.Robe, Equipment.Bandana),
-					"124": (Items.HealthPotion, Items.ManaPotion, Items.Antidote)}
-	townSquareMerchant = {"52": (Equipment.IronSword, Equipment.Dagger, Equipment.WoodenStaff), "54": (Equipment.IronArmour, Equipment.IronHelmet, Equipment.IronBuckler),
-						  "56": (Items.HealthPotion, Items.SuperHealthPotion, Items.ManaPotion, Items.SuperManaPotion), "58": (Items.Antidote, Items.HolyWater, Items.ThrowingKnife)}
+	townMerchant = {"44": [[Equipment.Knife, Equipment.Dagger], [4, 4]],
+					"84": [[Equipment.LeatherArmour, Equipment.LeatherShield, Equipment.Robe, Equipment.Bandana], [8, 4]],
+					"124": [[Items.HealthPotion, Items.ManaPotion, Items.Antidote], [12, 4]]}
+	townSquareMerchant = {"52": [[Equipment.IronSword, Equipment.Dagger, Equipment.WoodenStaff], [5, 2]], "54": [[Equipment.IronArmour, Equipment.IronHelmet, Equipment.IronBuckler], [5, 4]],
+						  "56": [[Items.HealthPotion, Items.SuperHealthPotion, Items.ManaPotion, Items.SuperManaPotion], [5, 6]], "58": [[Items.Antidote, Items.HolyWater, Items.ThrowingKnife], [5, 8]]}
 	allMerchants = [townMerchant, townSquareMerchant]
 
 class chests:
 	homeChest = {Items.HealthPotion['name']: [Items.HealthPotion, [3, 29]],
 				 Items.ManaPotion['name']: [Items.ManaPotion, [4, 29]]}
 	forestChest = {Items.HealthPotion['name']: [Items.HealthPotion, [9, 23]], Items.Antidote['name']: [Items.Antidote, [5, 11]]}
-	allChest = {mapNames.homeName: homeChest, mapNames.forestName: forestChest}
+	castleBasementChest = {QuestItems.skeletonCrown['name']: [QuestItems.skeletonCrown, [1, 1]], "GOLD": [Items.Gold, [1, 3], 100]}
+	allChest = {mapNames.homeName: homeChest, mapNames.forestName: forestChest, mapNames.castleBasementName: castleBasementChest}
 
 class mobs:
 	farmMobs = {"g": [[2, 23], [2, 25], [3, 29], [4, 27], [5, 22]]}
-	forestMobs = {"s": [[9, 7], [9, 14], [9, 24], [11, 3]], "r": [[6, 18], [12, 5]], "q": [[1, 14]]}
+	forestMobs = {"s": [[9, 7], [9, 14], [9, 24, True], [11, 3]], "r": [[6, 18], [12, 5]], "q": [[1, 14]]}
 	fieldMobs = {"r": [[3, 7], [3, 14], [3, 19]]}
-	caveMobs = {"ŝ": [[2, 12], [3, 29], [4, 12], [6, 1], [7, 12], [7, 25], [8, 17], [9, 8]], "§": [[2, 6]]}
+	caveMobs = {"ŝ": [[2, 12, True], [3, 29], [4, 12], [6, 1], [7, 12], [7, 25], [8, 17], [9, 8]], "§": [[2, 6]]}
 	kingStarPubMobs = {"b": [[1, 17]]}
-	allMobs = {mapNames.farmName: farmMobs, mapNames.forestName: forestMobs, mapNames.fieldName: fieldMobs, mapNames.caveName: caveMobs, mapNames.kingStarPubName: kingStarPubMobs}
+	castleMobs = {"ś": [[1, 15], [4, 29], [5, 29]]}
+	allMobs = {mapNames.farmName: farmMobs, mapNames.forestName: forestMobs, mapNames.fieldName: fieldMobs, mapNames.caveName: caveMobs,
+			   mapNames.kingStarPubName: kingStarPubMobs, mapNames.castleName: castleMobs}

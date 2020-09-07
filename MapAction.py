@@ -33,16 +33,18 @@ def detectCollision(self, yCoord, xCoord, mobs):
 			return "Information"
 		elif t in mobs:
 			return "Attack"
+		elif t in "@":
+			return "Player"
 	else:
 		return False
 
-def currentPosition(self, yCoord, xCoord, Maps):
-	previousPosition = Maps.currentMap[yCoord][0][xCoord]
+def currentPosition(self, yCoord, xCoord, currentMap):
+	previousPosition = currentMap[yCoord][0][xCoord]
 	self.addstr(yCoord, xCoord, previousPosition)
 	self.refresh()
 
-def movePlayer(self, color_pair, yCoord, xCoord):
-	self.addstr(yCoord, xCoord, "@", color_pair(16))
+def moveEntity(self, color_pair, yCoord, xCoord, char, colour):
+	self.addstr(yCoord, xCoord, char, color_pair(colour))
 	self.refresh()
 	return yCoord, xCoord
 
