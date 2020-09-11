@@ -1,4 +1,5 @@
 import curses
+from math import floor
 from UIAction import wrapText, loopInventory
 
 class mainUI:
@@ -46,9 +47,9 @@ class mainUI:
 			i = 4
 			pos = 33
 			loopUI(i, pos, charInv, self.addstr)
-			text = f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])} GOLD: {str(player.Gold)}"
+			text = f"STR: {str(floor(player.currentStats['MaxSTR']))} DEF: {str(floor(player.currentStats['MaxDEF']))} GOLD: {str(player.Gold)}"
 			whitespace = 28 - len(text)
-			orgText = f"STR: {str(player.currentStats['MaxSTR'])} DEF: {str(player.currentStats['MaxDEF'])}" + whitespace*" " + f"GOLD: {str(player.Gold)}"
+			orgText = f"STR: {str(floor(player.currentStats['MaxSTR']))} DEF: {str(floor(player.currentStats['MaxDEF']))}" + whitespace*" " + f"GOLD: {str(player.Gold)}"
 			self.addstr(5, 35, f"{orgText}", curses.A_UNDERLINE)
 			self.addstr(6, 35, f"HEAD: {player.equipped['HEAD']['name']}")
 			self.addstr(7, 35, f"CHEST: {player.equipped['CHEST']['name']}")
@@ -100,11 +101,17 @@ class mainUI:
 		text = ""
 		for x in item:
 			if title == "INVENTORY":
-				text += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])} "
+				text += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])}"
 				if x[i] != item[0][-1]:
 					text += "tab "
 			else:
-				text += f"{i + 1}. {x['name']}: {x['MANA']} MP "
+				try:
+					text += f"{i + 1}. {x['name']}: {x['MANA']} MP {x['POWER']} POWER "
+				except KeyError:
+					if x['type'] == "STAT":
+						text += f"{i + 1}. {x['name']}: {x['MANA']} MP ADD {x['heal']} "
+					else:
+						text += f"{i + 1}. {x['name']}: {x['MANA']} MP HEAL {x['heal']} "
 				if x != item[-1]:
 					text += "tab "
 			i += 1
@@ -371,3 +378,5 @@ empty = [["                                          "],
 
 UI = [["+-------------------------------------+"],
 	  ["|                                     |"]]
+
+logEmpty = [[""], [""]]

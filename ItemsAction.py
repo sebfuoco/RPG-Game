@@ -86,12 +86,12 @@ def useItem(self, player, temp, i, characterUI):
 	except IndexError:
 		pass
 
-def equip(self, player, temp, i, target):
+def equip(self, player, temp, i, target, charInventory):
 	if player.equipped[target] != temp[0][i][0]:
 		searchInventory(player, player.equipped[target])
 		temp[0][i][1] -= 1
 		player.equipped[target] = temp[0][i][0]
-		EquipmentStats(player)
+		EquipmentStats(self, player, charInventory)
 	else:
 		self.addstr(12, 35, f"{temp[0][i][0]['name']} ALREADY EQUIPPED")
 		self.refresh()
@@ -109,20 +109,20 @@ def equipItem(self, player, temp, i, choice, charInventoryUI):
 				choice = "LEFT-HAND"
 			elif choice in ("RIGHT-HAND", "RIGHT", "R"):
 				choice = "RIGHT-HAND"
-			temp = equip(self, player, temp, i, choice)
+			temp = equip(self, player, temp, i, choice, charInventoryUI)
 			charInventoryUI(self, player)
 			self.refresh()
 		else:
 			if player.stats["CLASS"] in temp[0][i][0]["equipClass"]:
 				if temp[0][i][0]["equipLocation"] == "HEAD":
-					temp = equip(self, player, temp, i, "HEAD")
+					temp = equip(self, player, temp, i, "HEAD", charInventoryUI)
 				elif temp[0][i][0]["equipLocation"] == "CHEST":
-					temp = equip(self, player, temp, i, "CHEST")
+					temp = equip(self, player, temp, i, "CHEST", charInventoryUI)
 				elif temp[0][i][0]["equipLocation"] == "HAND":
 					if choice in ("RIGHT-HAND", "RIGHT", "R"):
-						temp = equip(self, player, temp, i, "RIGHT-HAND")
+						temp = equip(self, player, temp, i, "RIGHT-HAND", charInventoryUI)
 					elif choice in ("LEFT-HAND", "LEFT", "L"):
-						temp = equip(self, player, temp, i, "LEFT-HAND")
+						temp = equip(self, player, temp, i, "LEFT-HAND", charInventoryUI)
 				charInventoryUI(self, player)
 				self.refresh()
 			else:
@@ -150,7 +150,7 @@ def deleteItem(temp, player, i):
 				break
 			z += 1
 
-def EquipmentStats(player):
+def EquipmentStats(self, player, charInventory):
 	stats = {"STR": 0, "DEF": 0, "EVASION": 0, "SPEED": 0}
 	for key, value in player.equipped.items():
 		for stat in stats:
@@ -163,3 +163,5 @@ def EquipmentStats(player):
 			player.currentStats["Max" + stat] = 0
 		else:
 			player.currentStats["Max" + stat] = player.stats[stat] + stats[stat]
+	charInventory(self, player)
+	self.refresh()

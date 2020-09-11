@@ -36,6 +36,10 @@ def loadMap(self, yCoord, xCoord, player):
     size = mainUI.worldUI(self, player, Maps, OS.OS)
     entityMap(self, Maps.currentMapMobs, mobs, Maps.currentMap, Maps.currentMapInfo, Maps.currentMapQuest, Maps.currentMapMerchant, OS.OS)
     chestMap(self, Maps.currentMapChest, OS.OS)
+    EquipmentStats(self, player, mainUI.charInventoryUI)
+    for spell in Magic.spellBook:
+        if "STAT" in spell["type"]:
+            spell["cast"] = 0
     return yCoord, xCoord, spawnLocation, size
 
 def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, attackType, mobCounter):
@@ -103,6 +107,8 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
         elif x == "Attack":
             attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI, newLine)
             yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
+            if player.status == "POISONED":
+                player.stats["HP"] -= 1
             mainUI.characterUI(self, player)
             self.refresh()
         else:
@@ -110,12 +116,12 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
             yCoord, xCoord = MapAction.moveEntity(self, color_pair, yCoord, xCoord, "@", 16)
             if mobCounter == 0:
                 mobMove(self, player, mobs.currentMobLocation.mobLocation, Maps.currentMapMobs, Maps.currentMap, MapAction.currentPosition,
-                        MapAction.moveEntity, MapAction.detectCollision, OS.OS, curses.color_pair, yCoord, xCoord)
+                        MapAction.moveEntity, MapAction.detectCollision, mainUI.characterUI, OS.OS, curses.color_pair, yCoord, xCoord)
             elif mobCounter == 1:
                 mobCounter = 0
-        if player.status == "POISONED":
-            player.stats["HP"] -= 1
-            mainUI.characterUI(self, player)
+            if player.status == "POISONED":
+                player.stats["HP"] -= 1
+                mainUI.characterUI(self, player)
     else:
         return originalCoord["yCoord"], originalCoord["xCoord"], spawnLocation, mobCounter
     return yCoord, xCoord, spawnLocation, mobCounter
@@ -124,7 +130,7 @@ def main(main):
     yCoord = 9
     xCoord = 15
     spawnLocation = 0
-    mobCounter = 0  # go to 1 and then reset to 0
+    mobCounter = 0  # go to 1 and then reset to 0,
     attackType = "PHYSICAL" 
     screen = curses.initscr()
     curses.start_color()
@@ -151,17 +157,19 @@ def main(main):
             player = Player("WARRIOR", Classes.Warrior.stats, Classes.Warrior.nextLevel, Classes.Warrior.equipped)
             break
         elif choice == "2":
-            player = Player("THIEF", Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
+            player = Player("MAGE", Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
+            player.initMagicBook()
+            player.initMagicLevel()
             break
         elif choice == "3":
-            player = Player("MAGE", Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
+            player = Player("THIEF", Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
             break
         else:
             screen.clear()
             screen.addstr(0, 0, "Not an option")
             screen.refresh()
             curses.napms(500)
-    EquipmentStats(player)
+    EquipmentStats(screen, player, mainUI.charInventoryUI)
     screen.clear()
     size = mainUI.worldUI(screen, player, Maps, OS.OS)
     MapAction.moveEntity(screen, curses.color_pair, yCoord, xCoord, "@", 16)
@@ -200,7 +208,7 @@ def main(main):
                     screen.addstr(12, 35, f"{Magic.selectedMagic['name']} IS NOW EQUIPPED")
                 except IndexError:
                     pass
-        elif key == 96:  # `
+        elif key == 96:  # "`" pressed
             if player.stats["CLASS"] == "MAGE":
                 if attackType == "PHYSICAL":
                     attackType = "MAGIC"
@@ -287,9 +295,57 @@ def main(main):
                     screen.refresh()
                     curses.napms(1000)
                 mainUI.logUI(screen)
-            elif command in ("S", "SPELLS"):
+            elif command in ("S", "SPELLS"):  # spells that player can use
                 if player.stats["CLASS"] == "MAGE":
                     mainUI.initWrap(screen, Magic.spellBook, "SPELLS")
+            elif command in ("C", "CAST"):  # cast support spell
+                if player.stats["CLASS"] == "MAGE":
+                    try:
+                        showSpells = []
+                        for spellType in Magic.spellBook:
+                            if spellType["type"] in ("SUPPORT", "STAT"):
+                                showSpells.append(spellType)
+                        if showSpells:
+                            mainUI.initWrap(screen, showSpells, "SPELLS")
+                            answer = int(my_raw_input(screen, 12, 35, "WHAT SPELL TO CAST?", 1)) - 1
+                            spell = showSpells[answer]
+                            mainUI.logUI(screen)
+                            if spell["type"] == "SUPPORT" or "STAT":
+                                if player.stats["MP"] >= spell["MANA"]:
+                                    if spell["heal"] == "POISON" and player.status != "NORMAL":
+                                        player.status = "NORMAL"
+                                        player.stats["MP"] -= spell["MANA"]
+                                        mainUI.characterUI(screen, player)
+                                    elif spell["heal"] in player.stats:
+                                        if spell["heal"] == "HP":
+                                            if player.stats["HP"] < player.currentStats["MaxHP"]:
+                                                player.stats[spell["heal"]] += spell["POWER"]
+                                                if player.stats[spell["heal"]] > player.currentStats["Max" + spell["heal"]]:
+                                                    player.stats[spell["heal"]] = player.currentStats["Max" + spell["heal"]]
+                                                player.stats["MP"] -= spell["MANA"]
+                                                mainUI.characterUI(screen, player)
+                                                screen.refresh()
+                                            else:
+                                                newLine(f"{spell['name']} FAILED", screen.addstr, 12, 64, 35, 35, logEmpty)
+                                        else:
+                                            if spell["cast"] != 3:
+                                                player.currentStats["Max" + spell["heal"]] *= spell["stat"]
+                                                player.stats["MP"] -= spell["MANA"]
+                                                spell["cast"] += 1
+                                                mainUI.charInventoryUI(screen, player)
+                                                mainUI.characterUI(screen, player)
+                                                screen.refresh()
+                                            else:
+                                                newLine(f"CANNOT USE {spell['name']} AGAIN", screen.addstr, 12, 64, 35, 35, logEmpty)
+                                    else:
+                                        newLine(f"{spell['name']} FAILED", screen.addstr, 12, 64, 35, 35, logEmpty)
+                                else:
+                                    newLine(f"NOT ENOUGH MANA", screen.addstr, 12, 64, 35, 35, logEmpty)
+                        else:
+                            newLine(f"NO USABLE SPELLS TO CAST", screen.addstr, 12, 64, 35, 35, logEmpty)
+                    except (ValueError, IndexError):
+                        mainUI.logUI(screen)
+                        pass
             elif command in ("Q", "QUESTS"):
                 if not player.activeQuests:
                     screen.addstr(1, 67, "NO ACTIVE QUESTS")

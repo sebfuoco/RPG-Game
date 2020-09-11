@@ -41,9 +41,10 @@ class info:
 					  "GO BACK TO YOUR HOME TOWN AND TALK TO THE ELDER, HE WILL KNOW WHAT TO DO",
 					  "I HAVE NOTHING TO TELL YOU YOUNG ONE, YOU MUST ADVENTURE ON YOUR OWN", 2]}
 	castleGateInfo = {"415": ["CASTLE GUARD", [4, 15], "SORRY, I CANNOT ALLOW YOU IN WITHOUT THE KINGS PERMISSION", "DON'T TELL ANYONE ABOUT THIS EXCHANGE", 2]}
+	castleThroneInfo = {"18": ["KING OF LUCIA", [1, 8], "HOW DID YOU GET INSIDE? GET OUT OF HERE BEFORE I GET YOUR EXECUTED!", 2]}
 	kingStarPubInfo = {"818": ["TAVERN KEEPER", [8, 18], "HEY KID, BE CAREFUL THERE'S A TROUBLEMAKER IN THE MAIN ROOM",
 							   "DAMN KID, YOU CAN TAKE A BEATING, SOMEONE LIKE YOU WOULD ATTRACT A LOT OF ATTENTION SO BE CAREFUL", 2]}
-	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo, mapNames.kingStarPubName: kingStarPubInfo}
+	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo, mapNames.castleThroneName: castleThroneInfo, mapNames.kingStarPubName: kingStarPubInfo}
 
 class merchants:
 	townMerchant = {"44": [[Equipment.Knife, Equipment.Dagger], [4, 4]],
@@ -62,10 +63,10 @@ class chests:
 
 class mobs:
 	farmMobs = {"g": [[2, 23], [2, 25], [3, 29], [4, 27], [5, 22]]}
-	forestMobs = {"s": [[9, 7], [9, 14], [9, 24, True], [11, 3]], "r": [[6, 18], [12, 5]], "q": [[1, 14]]}
-	fieldMobs = {"r": [[3, 7], [3, 14], [3, 19]]}
-	caveMobs = {"ŝ": [[2, 12, True], [3, 29], [4, 12], [6, 1], [7, 12], [7, 25], [8, 17], [9, 8]], "§": [[2, 6]]}
-	kingStarPubMobs = {"b": [[1, 17]]}
-	castleMobs = {"ś": [[1, 15], [4, 29], [5, 29]]}
+	forestMobs = {"s": [[9, 7], [9, 14], [9, 24, True], [11, 3]], "r": [[6, 18], [12, 5]], "q": [[1, 14, True]]}
+	fieldMobs = {"r": [[3, 7], [3, 14], [3, 19, True]]}
+	caveMobs = {"ŝ": [[2, 12], [3, 29, True], [4, 12], [6, 1, True], [7, 12], [7, 25, True], [8, 17], [9, 8]], "§": [[2, 6, True]]}
+	kingStarPubMobs = {"b": [[1, 17, True]]}
+	castleMobs = {"ś": [[1, 15, True], [4, 29, True], [5, 29, True]]}
 	allMobs = {mapNames.farmName: farmMobs, mapNames.forestName: forestMobs, mapNames.fieldName: fieldMobs, mapNames.caveName: caveMobs,
 			   mapNames.kingStarPubName: kingStarPubMobs, mapNames.castleName: castleMobs}
