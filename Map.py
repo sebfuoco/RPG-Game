@@ -143,7 +143,7 @@ class Maps:
 				  ["ǁ..............................ǁ"],
 				  ["+==============X===============+"]]
 	townSquareData = {"115": mapNames.castleGateName, "71": mapNames.fieldName, "730": mapNames.southLuciaName, "1315": mapNames.forestName}
-	townSquareSpawn = [[1, 15, 1], [7, 1, 1], [7, 30, 0], [13, 15, 0]]
+	townSquareSpawn = [[1, 15, 1], [7, 1, 1], [7, 30, 1], [13, 15, 0]]
 	townSquareQuest = initQuest(mapNames.townSquareName)
 	townSquareInfo = initInfo(mapNames.townSquareName)
 	allTownSquare = [mapNames.townSquareName, townSquare, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant]
@@ -237,20 +237,36 @@ class Maps:
 	allCave = [mapNames.caveName, cave, caveData, caveSpawn, caveMobs, None, None, None, None]
 
 	southLucia = [["+=============X================+"],
-				 ["ǁ..............................ǁ"],
-				 ["ǁ..............................ǁ"],
-				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒....ǁ"],
-				 ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄▒....ǁ"],
-				 ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄▒....ǁ"],
-				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒....ǁ"],
-				 ["X..............................ǁ"],
-				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
-				 ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...X˄˄˄˄˄˄˄˄˄˄˄˄˄▒ǁ"],
-				 ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
-				 ["+==============================+"]]
-	southLuciaData = {"71": mapNames.townSquareName, "915": mapNames.kingStarPubName}
-	southLuciaSpawn = [[7, 1, 2], [9, 15, 0]]
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒....ǁ"],
+				  ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄▒....ǁ"],
+				  ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄▒....ǁ"],
+				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒....ǁ"],
+				  ["X..............................ǁ"],
+				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
+				  ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...X˄˄˄˄˄˄˄˄˄˄˄˄˄▒ǁ"],
+				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
+				  ["+==============================+"]]
+	southLuciaData = {"114": mapNames.northLuciaName, "71": mapNames.townSquareName, "915": mapNames.kingStarPubName}
+	southLuciaSpawn = [[1, 14, 1], [7, 1, 2], [9, 15, 0]]
 	allSouthLucia = [mapNames.southLuciaName, southLucia, southLuciaData, southLuciaSpawn, None, None, None, None, None]
+	northLucia = [["+=============X================+"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..▒▒▒▒▒▒▒▒▒.....▒▒▒▒▒▒▒▒▒▒▒▒..ǁ"],
+				  ["ǁ..▒˄˄˄˄˄˄˄▒.....▒˄˄˄˄˄˄˄˄˄˄▒..ǁ"],
+				  ["ǁ..▒˄˄˄˄˄˄˄▒.....▒˄˄˄˄˄˄˄˄˄˄▒..ǁ"],
+				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒.ǁ"],
+				  ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄˄˄˄▒.ǁ"],
+				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒.ǁ"],
+				  ["+=============X================+"]]
+	northLuciaData = {"114": mapNames.northLuciaName, "1014": mapNames.southLuciaName}
+	northLuciaSpawn = [[1, 14, 0], [10, 14, 0]]
+	northLuciaInfo = initInfo(mapNames.northLuciaName)
+	allNorthLucia = [mapNames.northLuciaName, northLucia, northLuciaData, northLuciaSpawn, None, None, None, northLuciaInfo, None]
 
 	kingStarPub = [["+======================+"],
 				   ["ǁ...▒...▒...▒..........ǁ"],
@@ -263,13 +279,13 @@ class Maps:
 				   ["ǁ......................ǁ"],
 				   ["+======================+"]]
 	kingStarPubData = {"71": mapNames.southLuciaName}
-	kingStarPubSpawn = [[7, 1, 1]]
+	kingStarPubSpawn = [[7, 1, 2]]
 	kingStarPubMobs = initMob(mapNames.kingStarPubName)
 	kingStarPubInfo = initInfo(mapNames.kingStarPubName)
 	allKingStarPub = [mapNames.kingStarPubName, kingStarPub, kingStarPubData, kingStarPubSpawn, kingStarPubMobs, None, None, kingStarPubInfo, None]
 
 	# allMap template [mapName, map, mapData, mapSpawn, mapMobs, mapChests, mapQuest, mapInfo, mapMerchants]
-	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allCastle, allThroneCastle, allCastleBasement, allField, allCave, allSouthLucia, allKingStarPub]
+	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allCastle, allThroneCastle, allCastleBasement, allField, allCave, allSouthLucia, allNorthLucia, allKingStarPub]
 
 	quickStartMap = [[town, mapNames.townName, townData, townSpawn, None, None, None, None, merchants.townMerchant],
 					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant],

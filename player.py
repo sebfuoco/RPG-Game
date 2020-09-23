@@ -21,7 +21,7 @@ class Magic:
 	Evade = {"name": "EVADE", "type": "STAT", "heal": "EVASION", "stat": 10, "MANA": 10, "cast": 0, "LEVEL": 20}
 
 	# Spells that can be cast by player
-	learntSpells = [Fire, Ice, Thunder, Water, Heal, CurePoison, Teleport, Protect, Strength, Enhance, Haste, Evade]
+	learntSpells = [Fire, Ice, Thunder, Water, Earth, Heal, CurePoison, Teleport, Protect, Strength, Enhance, Haste, Evade]
 	spellBook = []
 	selectedMagic = ""
 
@@ -35,7 +35,7 @@ class Classes:
 					"RIGHT-HAND": Equipment.WoodenSword}
 	# Mage Stats + Factors
 	class Mage:
-		stats = {"CLASS": "MAGE", "HP": 15, "MP": 202, "STR": 1, "MagicSTR": 1, "DEF": 0, "SPEED": 3, "EVASION": 0}
+		stats = {"CLASS": "MAGE", "HP": 15, "MP": 202, "STR": 1111, "MagicSTR": 1, "DEF": 0, "SPEED": 3, "EVASION": 0}
 		nextLevel = {"HPIncrease": 2, "MPIncrease": 5, "STRIncrease": 1, "MagicSTRIncrease": 0.5, "SPEEDIncrease": 0.5}
 		equipped = {"HEAD": Equipment.Empty, "CHEST": Equipment.Clothes, "LEFT-HAND": Equipment.Empty,
 					"RIGHT-HAND": Equipment.WoodenWand}
@@ -77,28 +77,29 @@ class Player(object):
 		self.Inventory = [[Items.HealthPotion, 1], [Items.Antidote, 1]]
 		self.Gold = 20
 		self.status = "NORMAL"
-		self.keyItems = {QuestItems.royalCoin["name"]: QuestItems.royalCoin}
+		self.keyItems = {}
 		self.activeQuests = []
-		self.manaMultiplier = floor(self.currentStats["LEVEL"] * 2.25)
+		self.manaMultiplier = floor(self.currentStats["LEVEL"] * 0.25)
 		if self.manaMultiplier < 1:
 			self.manaMultiplier = 1
 
 	def initMagicBook(self):
 		for spell in Magic.learntSpells:
-			if self.currentStats["LEVEL"] >= spell["LEVEL"]:
-				Magic.spellBook.append(spell)
+			try:
+				if self.currentStats["LEVEL"] >= spell["LEVEL"] and spell not in Magic.spellBook:
+					Magic.spellBook.append(spell)
+			except TypeError:
+				pass
 		Magic.selectedMagic = Magic.spellBook[0]
 
 	def initMagicLevel(self):
 		for spell in Magic.spellBook:
 			if spell["type"] == "OFFENSIVE" or spell["heal"] == "HP":
-				spell["POWER"] = floor(spell["POWER"] * self.manaMultiplier)
 				spell["MANA"] = floor(spell["MANA"] * self.manaMultiplier)
 
 	def levelUp(self, screen, pos, charInventory):
 		while self.stats["XP"] >= self.currentStats["MaxXP"]:
 			self.manaMultiplier = floor(self.currentStats["LEVEL"] * 0.25)
-			self.initMagicLevel()
 			self.stats["XP"] -= self.currentStats["MaxXP"]
 			self.currentStats["MaxXP"] = round(self.currentStats["MaxXP"] * 1.5)
 			self.currentStats["LEVEL"] += 1
@@ -110,7 +111,11 @@ class Player(object):
 			self.stats["MagicSTR"] += self.nextLevel["MagicSTRIncrease"]
 			self.stats["SPEED"] += self.nextLevel["SPEEDIncrease"]
 			screen.addstr(pos, 35, f"YOU ARE NOW LEVEL {self.currentStats['LEVEL']}")
-			EquipmentStats(screen, self, charInventory)
+		if self.currentStats["CLASS"] in (Classes.Mage.stats["CLASS"], Classes.Wizard.stats["CLASS"]) and self.manaMultiplier < 1:
+			self.manaMultiplier = 1
+			self.initMagicBook()
+			self.initMagicLevel()
+		EquipmentStats(screen, self, charInventory)
 
 	def evolve(self, screen, pos, charInventory):
 		self.currentStats["MaxHP"] += self.nextLevel["HPIncrease"]

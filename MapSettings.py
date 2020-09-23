@@ -1,6 +1,6 @@
 from Map import mapNames
 from Items import Items, Equipment, QuestItems
-
+from mobs import mobList
 class quest:
 	elders_homeQuest = {"429": [["DELIVER MESSAGE TO TOWN ELDER", [4, 29],
 									f"HELLO YOUNG ONE, I AM TOO WEAK TO DELIVER THIS MESSAGE TO THE TOWN ELDER, CURRENTLY IN THE {mapNames.townSquareName}. "
@@ -44,7 +44,8 @@ class info:
 	castleThroneInfo = {"18": ["KING OF LUCIA", [1, 8], "HOW DID YOU GET INSIDE? GET OUT OF HERE BEFORE I GET YOUR EXECUTED!", 2]}
 	kingStarPubInfo = {"818": ["TAVERN KEEPER", [8, 18], "HEY KID, BE CAREFUL THERE'S A TROUBLEMAKER IN THE MAIN ROOM",
 							   "DAMN KID, YOU CAN TAKE A BEATING, SOMEONE LIKE YOU WOULD ATTRACT A LOT OF ATTENTION SO BE CAREFUL", 2]}
-	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo, mapNames.castleThroneName: castleThroneInfo, mapNames.kingStarPubName: kingStarPubInfo}
+	northLuciaInfo = {"114": ["TOWN GUARD", [1, 14], f"SORRY, I CANNOT LET YOU THROUGH WHILE THE {mobList.skeletonLord['name']} LIVES, ITS TOO DANGEROUS!", 2]}
+	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo, mapNames.castleThroneName: castleThroneInfo, mapNames.kingStarPubName: kingStarPubInfo, mapNames.northLuciaName: northLuciaInfo}
 
 class merchants:
 	townMerchant = {"44": [[Equipment.Knife, Equipment.Dagger], [4, 4]],
@@ -60,13 +61,14 @@ class chests:
 	forestChest = {Items.HealthPotion['name']: [Items.HealthPotion, [9, 23]], Items.Antidote['name']: [Items.Antidote, [5, 11]]}
 	castleBasementChest = {QuestItems.skeletonCrown['name']: [QuestItems.skeletonCrown, [1, 1]], "GOLD": [Items.Gold, [1, 3], 100]}
 	allChest = {mapNames.homeName: homeChest, mapNames.forestName: forestChest, mapNames.castleBasementName: castleBasementChest}
+2
 
 class mobs:
-	farmMobs = {"g": [[2, 23], [2, 25], [3, 29], [4, 27], [5, 22]]}
-	forestMobs = {"s": [[9, 7], [9, 14], [9, 24, True], [11, 3]], "r": [[6, 18], [12, 5]], "q": [[1, 14, True]]}
-	fieldMobs = {"r": [[3, 7], [3, 14], [3, 19, True]]}
-	caveMobs = {"ŝ": [[2, 12], [3, 29, True], [4, 12], [6, 1, True], [7, 12], [7, 25, True], [8, 17], [9, 8]], "§": [[2, 6, True]]}
-	kingStarPubMobs = {"b": [[1, 17, True]]}
-	castleMobs = {"ś": [[1, 15, True], [4, 29, True], [5, 29, True]]}
+	farmMobs = {mobList.goblin["ICON"]: [[2, 23], [2, 25], [3, 29], [4, 27], [5, 22]]}
+	forestMobs = {mobList.spider["ICON"]: [[9, 7], [9, 14], [9, 24, True], [11, 3]], mobList.rat["ICON"]: [[6, 18], [12, 5]], mobList.queenSpider["ICON"]: [[1, 14, True]]}
+	fieldMobs = {mobList.rat["ICON"]: [[3, 7], [3, 14], [3, 19, True]]}
+	caveMobs = {mobList.skeleton["ICON"]: [[2, 12], [3, 29, True], [4, 12], [6, 1, True], [7, 12], [7, 25, True], [8, 17], [9, 8]], mobList.skeletonLord["ICON"]: [[2, 6, True]]}
+	kingStarPubMobs = {mobList.bandit["ICON"]: [[1, 17, True]]}
+	castleMobs = {mobList.soldier["ICON"]: [[1, 15, True], [4, 29, True], [5, 29, True]]}
 	allMobs = {mapNames.farmName: farmMobs, mapNames.forestName: forestMobs, mapNames.fieldName: fieldMobs, mapNames.caveName: caveMobs,
 			   mapNames.kingStarPubName: kingStarPubMobs, mapNames.castleName: castleMobs}

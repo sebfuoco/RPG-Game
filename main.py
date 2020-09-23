@@ -80,7 +80,7 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
                 try:
                     if temp:
                         try:
-                            mainUI.initWrap(self, temp, "INVENTORY")
+                            mainUI.initWrap(self, None, temp, "INVENTORY")
                             number = int(my_raw_input(self, 12, 35, "WHAT WILL YOU SELL?", 1).decode("utf-8")) - 1
                             if number + 1 > len(temp):
                                 raise ValueError
@@ -142,7 +142,7 @@ def main(main):
         screen.addstr(str(i), curses.color_pair(i))
     screen.refresh()
     input = screen.getstr(3, 0, 0)
-    """
+"""
     while True:
         screen.clear()
         screen.addstr(0, 0,
@@ -154,15 +154,15 @@ def main(main):
         choice = my_raw_input(screen, 3, 0, "Type in a number below:", 1).decode("utf-8")
         screen.refresh()
         if choice == "1":
-            player = Player("WARRIOR", Classes.Warrior.stats, Classes.Warrior.nextLevel, Classes.Warrior.equipped)
+            player = Player(Classes.Warrior.stats["CLASS"], Classes.Warrior.stats, Classes.Warrior.nextLevel, Classes.Warrior.equipped)
             break
         elif choice == "2":
-            player = Player("MAGE", Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
+            player = Player(Classes.Mage.stats["CLASS"], Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
             player.initMagicBook()
             player.initMagicLevel()
             break
         elif choice == "3":
-            player = Player("THIEF", Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
+            player = Player(Classes.Thief.stats["CLASS"], Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
             break
         else:
             screen.clear()
@@ -218,7 +218,7 @@ def main(main):
         elif key in [105, 73]:  # "i" pressed
             mainUI.clearOptionalUI(screen)
             item = [player.Inventory for _ in player.Inventory]
-            mainUI.initWrap(screen, item, "INVENTORY")
+            mainUI.initWrap(screen, None, item, "INVENTORY")
         elif key in [99, 67]:  # "c" pressed
             curses.curs_set(1)
             mainUI.clearOptionalUI(screen)
@@ -230,7 +230,7 @@ def main(main):
             elif command in ("U", "USE"):
                 temp = inventoryUse(("ITEM",), player, False)
                 if temp:
-                    mainUI.initWrap(screen, temp, "INVENTORY")
+                    mainUI.initWrap(screen, None, temp, "INVENTORY")
                     try:
                         answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO USE?", 1).decode("utf-8")) - 1
                         mainUI.logUI(screen)
@@ -248,7 +248,7 @@ def main(main):
             elif command in ("E", "EQUIP"):
                 temp = inventoryUse(("ARMOUR", "WEAPON"), player, True)
                 if temp:
-                    mainUI.initWrap(screen, temp, "INVENTORY")
+                    mainUI.initWrap(screen, None, temp, "INVENTORY")
                     try:
                         answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO EQUIP?", 1).decode("utf-8")) - 1
                         mainUI.logUI(screen)
@@ -278,17 +278,34 @@ def main(main):
                 screen.refresh()
                 mainUI.logUI(screen)
                 mainUI.clearOptionalUI(screen)
-            elif command in ("I", "INFO"):
+            elif command in ("EI", "EINFO"):  # gets info from equipment
+                temp = inventoryUse(("WEAPON", "ARMOUR"), player, False)
+                if temp:
+                    mainUI.initWrap(screen, None, temp, "INVENTORY")
+                    try:
+                        answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO INSPECT?", 1).decode("utf-8")) - 1
+                        mainUI.logUI(screen)
+                        mainUI.clearOptionalUI(screen)
+                        answer = f"{temp[0][answer][0]['name']}: {temp[0][answer][0]['description']}"
+                        wrapText(screen.addstr, "INFO", answer, 1, 67, UI, "SIDE")
+                    except (TypeError, ValueError, IndexError):
+                        pass
+                else:
+                    screen.addstr(12, 35, f"NOTHING TO INSPECT")
+                    screen.refresh()
+                    curses.napms(1000)
+                mainUI.logUI(screen)
+            elif command in ("I", "INFO"):  # gets info from items
                 temp = inventoryUse(("ITEM",), player, False)
                 if temp:
-                    mainUI.initWrap(screen, temp, "INVENTORY")
+                    mainUI.initWrap(screen, None, temp, "INVENTORY")
                     try:
                         answer = int(my_raw_input(screen, 12, 35, "WHICH ITEM TO INSPECT?", 1).decode("utf-8")) - 1
                         mainUI.logUI(screen)
                         mainUI.clearOptionalUI(screen)
                         answer = f"{temp[1][answer][0]['name']}: {temp[1][answer][0]['description']}"
                         wrapText(screen.addstr, "INFO", answer, 1, 67, UI, "SIDE")
-                    except (TypeError, ValueError):
+                    except (TypeError, ValueError, IndexError):
                         pass
                 else:
                     screen.addstr(12, 35, f"NOTHING TO INSPECT")
@@ -297,7 +314,7 @@ def main(main):
                 mainUI.logUI(screen)
             elif command in ("S", "SPELLS"):  # spells that player can use
                 if player.stats["CLASS"] == "MAGE":
-                    mainUI.initWrap(screen, Magic.spellBook, "SPELLS")
+                    mainUI.initWrap(screen, player.currentStats['MaxMagicSTR'], Magic.spellBook, "SPELLS")
             elif command in ("C", "CAST"):  # cast support spell
                 if player.stats["CLASS"] == "MAGE":
                     try:
@@ -306,7 +323,7 @@ def main(main):
                             if spellType["type"] in ("SUPPORT", "STAT"):
                                 showSpells.append(spellType)
                         if showSpells:
-                            mainUI.initWrap(screen, showSpells, "SPELLS")
+                            mainUI.initWrap(screen, player.currentStats['MaxMagicSTR'], showSpells, "SPELLS")
                             answer = int(my_raw_input(screen, 12, 35, "WHAT SPELL TO CAST?", 1)) - 1
                             spell = showSpells[answer]
                             mainUI.logUI(screen)
@@ -319,7 +336,10 @@ def main(main):
                                     elif spell["heal"] in player.stats:
                                         if spell["heal"] == "HP":
                                             if player.stats["HP"] < player.currentStats["MaxHP"]:
-                                                player.stats[spell["heal"]] += spell["POWER"]
+                                                colourEntity(screen, yCoord, xCoord, {"ICON": "@"}, "HEAL")
+                                                colourEntity(screen, yCoord, xCoord, {"ICON": "@"}, None)
+                                                spellPower = floor(spell["POWER"] * player.currentStats["MaxMagicSTR"])
+                                                player.stats[spell["heal"]] += spellPower
                                                 if player.stats[spell["heal"]] > player.currentStats["Max" + spell["heal"]]:
                                                     player.stats[spell["heal"]] = player.currentStats["Max" + spell["heal"]]
                                                 player.stats["MP"] -= spell["MANA"]

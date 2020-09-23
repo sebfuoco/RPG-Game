@@ -1,6 +1,9 @@
 import random
+import curses
+import time
 import mobs
 from player import Magic
+from UI import colourEntity
 import math
 
 def mobMove(self, player, mobLocation, currentMapMobs, currentMap, currentPosition, moveEntity, detectCollision, characterUI, OS, color_pair, yCoord, xCoord):
@@ -77,6 +80,8 @@ def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, Ma
 			if Magic.selectedMagic["ELEMENT"] == currentMobLocation.mobLocation[x][0]["weakness"]:
 				playerDamage *= 2
 			player.stats["MP"] -= Magic.selectedMagic["MANA"]
+			colourEntity(self, yCoord, xCoord, currentMobLocation.mobLocation[x][0], Magic.selectedMagic["ELEMENT"])
+			colourEntity(self, yCoord, xCoord, currentMobLocation.mobLocation[x][0], False)
 		else:
 			playerDamage = player.currentStats["MaxSTR"] - currentMobLocation.mobLocation[x][0]["DEF"]
 	else:

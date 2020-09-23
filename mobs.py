@@ -9,6 +9,8 @@ class mobList:
 				"XP": 10, "GOLD": 20, "ICON": "b"}
 	soldier = {"name": "SOLDIER", "type": "NORMAL", "weakness": "NONE", "HP": 50, "STR": 10, "DEF": 5, "SPEED": 3,
 			  "XP": 50, "GOLD": 10, "ICON": "ś"}
+	evilMage = {"name": "EVIL MAGE", "type": "NORMAL", "weakness": "NONE", "HP": 30, "STR": 2, "MagicSTR": 2, "DEF": 2, "SPEED": 3,
+			   "XP": 30, "GOLD": 30, "ICON": "m"}
 
 class mobIcons:
 	mobs = {}

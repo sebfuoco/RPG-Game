@@ -1,4 +1,5 @@
 import curses
+import time
 from math import floor
 from UIAction import wrapText, loopInventory
 
@@ -96,17 +97,17 @@ class mainUI:
 			size = False
 		return size
 
-	def initWrap(self, item, title):
+	def initWrap(self, MaxMagicSTR, item, title):
 		i = 0
 		text = ""
 		for x in item:
 			if title == "INVENTORY":
-				text += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])}"
+				text += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])} "
 				if x[i] != item[0][-1]:
 					text += "tab "
 			else:
 				try:
-					text += f"{i + 1}. {x['name']}: {x['MANA']} MP {x['POWER']} POWER "
+					text += f"{i + 1}. {x['name']}: {x['MANA']} MP {x['POWER'] * MaxMagicSTR} DAMAGE "
 				except KeyError:
 					if x['type'] == "STAT":
 						text += f"{i + 1}. {x['name']}: {x['MANA']} MP ADD {x['heal']} "
@@ -265,23 +266,21 @@ def loopMap(item, screen, OS):
 		col, row = (0, 0)
 		while col < len(item):
 			for _ in enumerate(item[0][0]):
-				if item[col][0][row] in "X":
+				if item[col][0][row] in "X":  # WHITE
 					if OS == "LINUX":
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(0) | curses.A_REVERSE)
 					else:
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(1))
-				elif item[col][0][row] in "*":
+				elif item[col][0][row] in "*":  # LIGHT GREEN
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(11))
-				elif item[col][0][row] in "M":
-					screen.addstr(col, row, item[col][0][row], curses.color_pair(12))
-				elif item[col][0][row] in ("˄", "^"):
+				elif item[col][0][row] in ("˄", "^"):  # YELLOW
 					if OS == "LINUX":
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(4))
 					else:
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(7))
 				elif item[col][0][row] in ("|", "-"):
 					screen.addstr(col, row, item[col][0][row], curses.color_pair(9))
-				elif item[col][0][row] in (" ", "~"):
+				elif item[col][0][row] in (" ", "~"):  # LIGHT BLUE
 					if OS == "LINUX":
 						screen.addstr(col, row, item[col][0][row], curses.color_pair(7) | curses.A_REVERSE)
 					else:
@@ -295,6 +294,34 @@ def loopMap(item, screen, OS):
 		print("TERMINAL SIZE TOO SMALL, PLEASE RESIZE!")
 		size = False
 		return size
+
+def colourEntity(self, yCoord, xCoord, ICON, animate):
+	from main import OS
+	if animate:
+		if animate == "FIRE":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(13) | curses.A_REVERSE)
+		elif animate == "ICE":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(10) | curses.A_REVERSE)
+		elif animate == "THUNDER":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(15) | curses.A_REVERSE)
+		elif animate == "WATER":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(2) | curses.A_REVERSE)
+		elif animate == "EARTH":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(7) | curses.A_REVERSE)
+		elif animate == "HEAL":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(3) | curses.A_REVERSE)
+	else:
+		if ICON.get("type") == "BOSS":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(6))
+		elif ICON["ICON"] == "@":
+			self.addstr(yCoord, xCoord, ICON["ICON"])
+		else:
+			if OS == "LINUX":
+				self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(2))
+			else:
+				self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(5))
+	self.refresh()
+	time.sleep(0.3)
 
 def initEntity(self, entity, OS, char, colour):
 	target = ""
@@ -325,9 +352,9 @@ def initMob(self, currentMapMobs, mobs, currentMap, OS):
 							mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1], item[2]]]
 						except IndexError:
 							mobs.currentMobLocation.mobLocation += [[mobs.mobIcons.mobs[key].copy(), item[0], item[1], False]]
-						if mobs.currentMobLocation.mobLocation[i][0]["type"] == "BOSS":
+						if mobs.currentMobLocation.mobLocation[i][0]["type"] == "BOSS":  # PURPLE
 							self.addstr(item[0], item[1], key, curses.color_pair(6))
-						else:
+						else:  # RED
 							if OS == "LINUX":
 								self.addstr(item[0], item[1], key, curses.color_pair(2))
 							else:
@@ -338,9 +365,9 @@ def initMob(self, currentMapMobs, mobs, currentMap, OS):
 
 def entityMap(self, currentMapMobs, mobs, currentMap, currentMapInfo, currentMapQuest, currentMapMerchant, OS):
 	initMob(self, currentMapMobs, mobs, currentMap, OS)
-	initEntity(self, currentMapInfo, OS, "I", 4)
-	initEntity(self, currentMapQuest, OS, "Q", 4)
-	initEntity(self, currentMapMerchant, OS, "M", 9)
+	initEntity(self, currentMapInfo, OS, "I", 4)  # YELLOW
+	initEntity(self, currentMapQuest, OS, "Q", 4)  # YELLOW
+	initEntity(self, currentMapMerchant, OS, "M", 9)  # LIGHT BLUE
 
 def chestMap(self, currentMapChest, OS):
 	try:

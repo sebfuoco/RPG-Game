@@ -151,17 +151,17 @@ def deleteItem(temp, player, i):
 			z += 1
 
 def EquipmentStats(self, player, charInventory):
-	stats = {"STR": 0, "DEF": 0, "EVASION": 0, "SPEED": 0}
+	stats = {"STR": 0, "MagicSTR": 0, "DEF": 0, "EVASION": 0, "SPEED": 0}
 	for key, value in player.equipped.items():
 		for stat in stats:
 			try:
-				stats[stat] += value[stat]
+				stats[stat] += int(value[stat])
 			except KeyError:
 				pass
 	for stat in stats:
 		if player.stats[stat] + stats[stat] < 0:
 			player.currentStats["Max" + stat] = 0
 		else:
-			player.currentStats["Max" + stat] = player.stats[stat] + stats[stat]
+			player.currentStats["Max" + stat] = int(player.stats[stat] + stats[stat])
 	charInventory(self, player)
 	self.refresh()
