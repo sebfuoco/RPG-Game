@@ -1,8 +1,9 @@
 from Map import mapNames
 from Items import Items, Equipment, QuestItems
 from mobs import mobList
+
 class quest:
-	elders_homeQuest = {"429": [["DELIVER MESSAGE TO TOWN ELDER", [4, 29],
+	elders_homeQuest = {"429": [0, ["DELIVER MESSAGE TO TOWN ELDER", [4, 29],
 									f"HELLO YOUNG ONE, I AM TOO WEAK TO DELIVER THIS MESSAGE TO THE TOWN ELDER, CURRENTLY IN THE {mapNames.townSquareName}. "
 									f"I WOULD BE DELIGHTED IF YOU SENT IT TO HIM.", [mapNames.townSquareName, [8, 16],
 																					 {"GOLD": 10, "XP": 10,
@@ -11,14 +12,15 @@ class quest:
 																						  1], "QUESTITEM": [QuestItems.letter, 1]}, False]],
 								   ["DEFEAT THE SKELETON LORD", [4, 29],
 									f"AH YOUR BACK! I TAKE IT HE TOLD YOU OF THE DANGERS WITHIN THE {mapNames.caveName}. "
-									f"THE SKELETON LORD IS FEARSOME BUT HE IS WEAK TO LIGHT, USE THIS KNOWLEDGE TO DEFEAT HIM!",
+									f"THE SKELETON LORD IS FEARSOME BUT HE IS WEAK TO LIGHT, WHICH HOLY WATER IS MADE OUT OF! "
+									f"USE THIS KNOWLEDGE TO DEFEAT HIM AND TAKE SOME HOLY WATER TO HELP BEAT HIM!",
 									[mapNames.townSquareName, [8, 16],
 									 {"GOLD": 10, "XP": 10, "REWARD": [QuestItems.skeletonKey, 1], "QUESTITEM": [Items.HolyWater, 1]}, False]]]}
-	farmQuest = {"416": [["KILL GOBLINS", [4, 16],
+	farmQuest = {"416": [0, ["KILL GOBLINS", [4, 16],
 			  f"I NEED YOUR HELP! THERE ARE GOBLINS IN MY BARN, PLEASE GET RID OF THEM FOR ME!",
 			  [mapNames.farmName, [4, 16],
 			   {"GOLD": 10, "XP": 10, "REWARD": [Equipment.Knife, 1]}, False]]]}
-	townSquareQuest = {"529": [[f"FIGHT IN {mapNames.kingStarPubName}", [5, 29], f"HELLO BEAUTIFUL, THE NAMES SANDRA. YOU MAY OF HEAR OF ME FROM THE OTHERS AND WHAT I DO, "
+	townSquareQuest = {"529": [0, [f"FIGHT IN {mapNames.kingStarPubName}", [5, 29], f"HELLO BEAUTIFUL, THE NAMES SANDRA. YOU MAY OF HEAR OF ME FROM THE OTHERS AND WHAT I DO, "
 									f"BUT DON'T WORRY I CAN CUT US A DEAL WE WOULD BOTH LIKE. THERE'S THIS GUY THAT HAS BEEN BOTHERING ME IN THE {mapNames.kingStarPubName}, "
 									f"TAKE HIM OUT AND I'LL REWARD YOU", [mapNames.townSquareName, [5, 29], {"GOLD": 10, "XP": 10, "REWARD": [QuestItems.royalCoin, 1]}, False]],
 							   ["STEAL CASTLE TREASURE", [5, 29], f"BACK FOR MORE?, THAT {QuestItems.royalCoin['name']} I GAVE YOU WILL GIVE YOU ACCESS TO THE CASTLE, IF THE GUARD IS GREEDY. ANYWAYS,"
@@ -44,8 +46,11 @@ class info:
 	castleThroneInfo = {"18": ["KING OF LUCIA", [1, 8], "HOW DID YOU GET INSIDE? GET OUT OF HERE BEFORE I GET YOUR EXECUTED!", 2]}
 	kingStarPubInfo = {"818": ["TAVERN KEEPER", [8, 18], "HEY KID, BE CAREFUL THERE'S A TROUBLEMAKER IN THE MAIN ROOM",
 							   "DAMN KID, YOU CAN TAKE A BEATING, SOMEONE LIKE YOU WOULD ATTRACT A LOT OF ATTENTION SO BE CAREFUL", 2]}
-	northLuciaInfo = {"114": ["TOWN GUARD", [1, 14], f"SORRY, I CANNOT LET YOU THROUGH WHILE THE {mobList.skeletonLord['name']} LIVES, ITS TOO DANGEROUS!", 2]}
-	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo, mapNames.castleThroneName: castleThroneInfo, mapNames.kingStarPubName: kingStarPubInfo, mapNames.northLuciaName: northLuciaInfo}
+	northLuciaInfo = {"115": ["TOWN GUARD", [1, 15], f"SORRY, I CANNOT LET YOU THROUGH WHILE THE {mobList.skeletonLord['name']} LIVES, ITS TOO DANGEROUS!", 2]}
+	abandonedChurchInfo = {"111": ["PRIEST", [1, 11], "PLEASE HELP! THESE DEMONS ARE CORRUPTING THE CHURCH!", "THANK YOU, BRAVE ADVENTURER "
+																											  "YOU HAVE SAVED THIS CHURCH FROM EVIL", 2]}
+	allInfo = {mapNames.farmName: farmInfo, mapNames.townSquareName: townSquareInfo, mapNames.castleGateName: castleGateInfo,
+			   mapNames.castleThroneName: castleThroneInfo, mapNames.kingStarPubName: kingStarPubInfo, mapNames.northLuciaName: northLuciaInfo, mapNames.abandonedChurch: abandonedChurchInfo}
 
 class merchants:
 	townMerchant = {"44": [[Equipment.Knife, Equipment.Dagger], [4, 4]],
@@ -61,7 +66,6 @@ class chests:
 	forestChest = {Items.HealthPotion['name']: [Items.HealthPotion, [9, 23]], Items.Antidote['name']: [Items.Antidote, [5, 11]]}
 	castleBasementChest = {QuestItems.skeletonCrown['name']: [QuestItems.skeletonCrown, [1, 1]], "GOLD": [Items.Gold, [1, 3], 100]}
 	allChest = {mapNames.homeName: homeChest, mapNames.forestName: forestChest, mapNames.castleBasementName: castleBasementChest}
-2
 
 class mobs:
 	farmMobs = {mobList.goblin["ICON"]: [[2, 23], [2, 25], [3, 29], [4, 27], [5, 22]]}
@@ -70,5 +74,7 @@ class mobs:
 	caveMobs = {mobList.skeleton["ICON"]: [[2, 12], [3, 29, True], [4, 12], [6, 1, True], [7, 12], [7, 25, True], [8, 17], [9, 8]], mobList.skeletonLord["ICON"]: [[2, 6, True]]}
 	kingStarPubMobs = {mobList.bandit["ICON"]: [[1, 17, True]]}
 	castleMobs = {mobList.soldier["ICON"]: [[1, 15, True], [4, 29, True], [5, 29, True]]}
+	luciaGatesMobs = {mobList.bandit["ICON"]: [[1, 14, True], [4, 5], [4, 18, True], [8, 14]]}
+	abandonedChurchMobs = {mobList.evilMage["ICON"]: [[5, 11], [9, 5], [10, 8]]}
 	allMobs = {mapNames.farmName: farmMobs, mapNames.forestName: forestMobs, mapNames.fieldName: fieldMobs, mapNames.caveName: caveMobs,
-			   mapNames.kingStarPubName: kingStarPubMobs, mapNames.castleName: castleMobs}
+			   mapNames.kingStarPubName: kingStarPubMobs, mapNames.castleName: castleMobs, mapNames.luciaGates: luciaGatesMobs, mapNames.abandonedChurch: abandonedChurchMobs}

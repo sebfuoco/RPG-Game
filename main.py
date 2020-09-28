@@ -6,7 +6,7 @@ from Map import Maps, mapNames
 from ItemsAction import *  # Imports Items file as well
 from questAction import quest
 from UIAction import loopInventory, wrapText, newLine
-from player import Classes, Player, Magic
+from player import Classes, Player, Magic, Abilities
 from mobAction import attack, mobMove
 
 # check OS, Windows works differently than Linux, supporting less colour.
@@ -158,8 +158,9 @@ def main(main):
             break
         elif choice == "2":
             player = Player(Classes.Mage.stats["CLASS"], Classes.Mage.stats, Classes.Mage.nextLevel, Classes.Mage.equipped)
-            player.initMagicBook()
+            player.initBook(Magic.learntSpells, Magic.spellBook)
             player.initMagicLevel()
+            Magic.selectedMagic = Magic.spellBook[0]
             break
         elif choice == "3":
             player = Player(Classes.Thief.stats["CLASS"], Classes.Thief.stats, Classes.Thief.nextLevel, Classes.Thief.equipped)
@@ -169,6 +170,7 @@ def main(main):
             screen.addstr(0, 0, "Not an option")
             screen.refresh()
             curses.napms(500)
+    player.initBook(Abilities.learntAbilities, Abilities.abilityBook)
     EquipmentStats(screen, player, mainUI.charInventoryUI)
     screen.clear()
     size = mainUI.worldUI(screen, player, Maps, OS.OS)
@@ -219,6 +221,9 @@ def main(main):
             mainUI.clearOptionalUI(screen)
             item = [player.Inventory for _ in player.Inventory]
             mainUI.initWrap(screen, None, item, "INVENTORY")
+        elif key in [107, 75]:  # "k" pressed
+            mainUI.clearOptionalUI(screen)
+            mainUI.initWrap(screen, None, player.keyItems, "KEY ITEMS")
         elif key in [99, 67]:  # "c" pressed
             curses.curs_set(1)
             mainUI.clearOptionalUI(screen)
@@ -366,6 +371,10 @@ def main(main):
                     except (ValueError, IndexError):
                         mainUI.logUI(screen)
                         pass
+            elif command in ("CH", "CHARACTER"):  # display other character stats
+                mainUI.initWrap(screen, None, Abilities.abilityBook, "ABILITIES")
+            elif command in ("A", "ABILITY"):  # display class abilities
+                mainUI.initWrap(screen, None, Abilities.abilityBook, "ABILITIES")
             elif command in ("Q", "QUESTS"):
                 if not player.activeQuests:
                     screen.addstr(1, 67, "NO ACTIVE QUESTS")

@@ -105,6 +105,17 @@ class mainUI:
 				text += f"{i + 1}. {x[i][1]}x {str(x[i][0]['name'])} "
 				if x[i] != item[0][-1]:
 					text += "tab "
+			elif title == "KEY ITEMS":
+				text += f"{i + 1}. {str(x)} "
+				if x != list(item)[-1]:
+					text += "tab "
+			elif title == "ABILITIES":
+				countdown = f"COOLDOWN OF {str(x['countdown'])} KILLS"
+				if x['countdown'] == 0:
+					countdown = "AVAILABLE TO USE"
+				text += f"{i + 1}. {x['name']}: {str(x['description'])}, {x['POWER']} POWER, {countdown}"
+				if x != item[-1]:
+					text += "tab "
 			else:
 				try:
 					text += f"{i + 1}. {x['name']}: {x['MANA']} MP {x['POWER'] * MaxMagicSTR} DAMAGE "
@@ -116,6 +127,7 @@ class mainUI:
 				if x != item[-1]:
 					text += "tab "
 			i += 1
+
 		wrapText(self.addstr, title, text, 1, 67, UI, "SIDE")
 
 	def merchantUI(self, yCoord, xCoord, currentMerchant):
@@ -204,19 +216,19 @@ class mainUI:
 		pos = 67
 		try:
 			from questAction import startQuestReward
-			if Maps.currentMapQuest[z][0] in player.activeQuests:
+			if Maps.currentMapQuest[z][1] in player.activeQuests:
 				notComplete = quest.checkQuest(self.addstr, player, z, Maps, mapNames, loopInventory, wrapText, QuestItems)
 				if notComplete:
 					self.addstr(i, pos, "QUEST IN PROGRESS")
 			else:
-				wrapText(self.addstr, Maps.currentMapQuest[z][0][0], Maps.currentMapQuest[z][0][2], i, pos, UI, "SIDE")
-				player.activeQuests.append(Maps.currentMapQuest[z][0])
-				startReward = Maps.currentMapQuest[z][0][3][2]["QUESTITEM"]
+				wrapText(self.addstr, Maps.currentMapQuest[z][1][0], Maps.currentMapQuest[z][1][2], i, pos, UI, "SIDE")
+				player.activeQuests.append(Maps.currentMapQuest[z][1])
+				startReward = Maps.currentMapQuest[z][1][3][2]["QUESTITEM"]
 				if startReward[0]["type"] == "QUEST":
 					player.keyItems[startReward[0]["name"]] = startReward[0]
 				else:
 					startQuestReward(self.addstr, player, startReward, loopInventory, wrapText)
-				if Maps.currentMapQuest[z][0][0] == Maps.elders_homeQuest["429"][0][0]:
+				if Maps.currentMapQuest[z][1][0] == Maps.elders_homeQuest["429"][1][0]:
 					Maps.townSquareInfo[-1] += 1
 		except KeyError:
 			if Maps.currentMapQuest[z] == "IN PROGRESS":
@@ -298,6 +310,7 @@ def loopMap(item, screen, OS):
 def colourEntity(self, yCoord, xCoord, ICON, animate):
 	from main import OS
 	if animate:
+		duration = 0.3
 		if animate == "FIRE":
 			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(13) | curses.A_REVERSE)
 		elif animate == "ICE":
@@ -310,6 +323,11 @@ def colourEntity(self, yCoord, xCoord, ICON, animate):
 			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(7) | curses.A_REVERSE)
 		elif animate == "HEAL":
 			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(3) | curses.A_REVERSE)
+		elif animate == "NORMAL":
+			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(0) | curses.A_REVERSE)
+			duration = 0.1
+		self.refresh()
+		time.sleep(duration)
 	else:
 		if ICON.get("type") == "BOSS":
 			self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(6))
@@ -321,7 +339,6 @@ def colourEntity(self, yCoord, xCoord, ICON, animate):
 			else:
 				self.addstr(yCoord, xCoord, ICON["ICON"], curses.color_pair(5))
 	self.refresh()
-	time.sleep(0.3)
 
 def initEntity(self, entity, OS, char, colour):
 	target = ""
@@ -330,7 +347,7 @@ def initEntity(self, entity, OS, char, colour):
 			if char == "I":
 				target = entity[key][1]
 			elif char == "Q":
-				target = entity[key][0][1]
+				target = entity[key][1][1]
 			elif char == "M":
 				target = entity[key][1]
 			if OS == "LINUX":

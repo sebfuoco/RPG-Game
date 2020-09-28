@@ -21,7 +21,7 @@ class Magic:
 	Evade = {"name": "EVADE", "type": "STAT", "heal": "EVASION", "stat": 10, "MANA": 10, "cast": 0, "LEVEL": 20}
 
 	# Spells that can be cast by player
-	learntSpells = [Fire, Ice, Thunder, Water, Earth, Heal, CurePoison, Teleport, Protect, Strength, Enhance, Haste, Evade]
+	learntSpells = [Fire, Ice, Thunder, Water, Heal, CurePoison, Teleport, Protect, Strength, Enhance, Haste, Evade]
 	spellBook = []
 	selectedMagic = ""
 
@@ -60,9 +60,58 @@ class Classes:
 		stats = {"CLASS": "WIZARD", "HP": 5, "MP": 20, "MagicSTR": 1}
 		nextLevel = {"HPIncrease": 1, "MPIncrease": 10, "STRIncrease": 0, "MagicSTRIncrease": 1, "SPEEDIncrease": 0.5}
 
+class Abilities:
+	# Warrior Ability, cooldown based on kills
+	Slash = {"name": "SLASH", "CLASS": Classes.Warrior.stats['CLASS'], "COOLDOWN": 5, "POWER": 5, "LEVEL": 3, "countdown": 0,
+			 "description": "SLASHES ALL NEARBY ENEMIES WITHIN 1 TILE PROXIMITY"}
+	Charge = {"name": "CHARGE", "CLASS": Classes.Warrior.stats['CLASS'], "COOLDOWN": 5, "POWER": 5, "LEVEL": 10, "countdown": 0,
+			  "description": "CHARGE AT AN ENEMY TO APPEAR BESIDE THEM"}
+	Rage = {"name": "RAGE", "CLASS": Classes.Warrior.stats['CLASS'], "COOLDOWN": 5, "POWER": 5, "LEVEL": 15, "countdown": 0,
+			"description": "CASTER GOES INTO A RAGE, DOUBLING THEIR STR AND HALVES DEF AND EVASION"}
+	# Thief Ability, cooldown based on kills
+	Steal = {"name": "STEAL", "CLASS": Classes.Thief.stats['CLASS'], "COOLDOWN": 0, "POWER": 20, "LEVEL": 1, "countdown": 0,
+			 "description": "STEALS AN ITEM FROM AN ENEMY, POWER DETERMINES HIT-RATE"}
+	SneakAttack = {"name": "SNEAK ATTACK", "CLASS": Classes.Thief.stats['CLASS'], "COOLDOWN": 5, "POWER": 5, "LEVEL": 10, "countdown": 0,
+				   "description": "ATTACKS AN ENEMY, WITH A HIGH CRIT RATE"}
+	AerialStrike = {"name": "AERIAL STRIKE", "CLASS": Classes.Thief.stats['CLASS'], "COOLDOWN": 10, "POWER": 5, "LEVEL": 15, "countdown": 0,
+					"description": "CASTER JUMPS AND STRIKES AN ENEMY FROM THE SKY, DEALING HEAVY DAMAGE TO FLYING ENEMIES"}
+	# Mage Ability, based on magic kills, still uses mana
+	Absorb = {"name": "ABSORB", "CLASS": Classes.Mage.stats['CLASS'], "COOLDOWN": 5, "POWER": 5, "LEVEL": 2, "countdown": 0,
+			  "description": "ABSORBS MANA FROM ENEMIES, MORE EFFECTIVE AGAINST MAGICAL ENEMIES, POWER DETERMINES MANA ABSORBED"}
+	ManaShield = {"name": "MANA SHIELD", "CLASS": Classes.Mage.stats['CLASS'], "COOLDOWN": 10, "LEVEL": 15, "countdown": 0,
+				  "description": "CASTER SURROUNDINGS THEMSELVES WITH MANA, TAKING DAMAGE TO THEIR MANA INSTEAD OF HEALTH"}
+	Teleport = {"name": "TELEPORT", "CLASS": Classes.Mage.stats['CLASS'], "COOLDOWN": 0, "LEVEL": 20, "countdown": 0,
+				"description": "TELEPORTS CASTER TO ANOTHER AREA OF CHOICE"}
+	# 	# Knight Ability
+	HolyStrike = {"name": "HOLY STRIKE", "CLASS": Classes.Knight.stats['CLASS'], "COOLDOWN": 10, "POWER": 5, "ELEMENT": "HOLY",
+				  "LEVEL": 20, "countdown": 0, "description": "STRIKE THAT DEALS HOLY DAMAGE TO A ENEMY"}
+	Guard = {"name": "GUARD", "CLASS": Classes.Knight.stats['CLASS'], "COOLDOWN": 5, "POWER": 10, "LEVEL": 30, "countdown": 0,
+			 "description": "CASTER PREPARES FOR IMPACT, INCREASING DEF"}
+	Recover = {"name": "RECOVER", "CLASS": Classes.Knight.stats['CLASS'], "COOLDOWN": 10, "POWER": 10, "LEVEL": 40, "countdown": 0,
+			   "description": "CASTER RECOVERS HP"}
+	# Ninja Ability
+	Stealth = {"name": "STEALTH", "CLASS": Classes.Ninja.stats['CLASS'], "COOLDOWN": 10, "POWER": 25, "LEVEL": 20, "countdown": 0,
+			   "description": "HIDES THE CASTER FROM ENEMIES, INCREASING EVASION"}
+	Dash = {"name": "DASH", "CLASS": Classes.Ninja.stats['CLASS'], "COOLDOWN": 5, "LEVEL": 30, "countdown": 0, "description":
+			"CASTER RUNS IN A DIRECTION, AVOIDING ALL ATTACKS AND DAMAGE"}
+	SmokeScreen = {"name": "SMOKESCREEN", "CLASS": Classes.Ninja.stats['CLASS'], "COOLDOWN": 10, "LEVEL": 40, "countdown": 0,
+				   "description": "CASTER THROWS SMOKE, CONFUSING THE ENEMY AND MAY CAUSE IT TO ATTACK ITSELF"}
+	# Wizard Ability
+	FireBlast = {"name": "FIRE BLAST", "CLASS": Classes.Wizard.stats['CLASS'], "COOLDOWN": 10, "POWER": 5, "LEVEL": 20, "countdown": 0,
+				 "ELEMENT": "FIRE", "description": "SHOTS A BLAST OF FIRE AROUND THE CASTER, DEALING FIRE DAMAGE"}
+	IceStorm = {"name": "ICE STORM", "CLASS": Classes.Wizard.stats['CLASS'], "COOLDOWN": 10, "POWER": 5, "LEVEL": 30, "countdown": 0,
+				"ELEMENT": "ICE", "description": "SUMMONS AN ICE STORM THAT AT AN ENEMY, DEALING ICE DAMAGE TO THAT ENEMY AND NEARBY "
+												 "ENEMIES WITHIN A 1 TILE PROXIMITY"}
+	ThunderStorm = {"name": "THUNDER STORM", "CLASS": Classes.Wizard.stats['CLASS'], "COOLDOWN": 10, "POWER": 5, "LEVEL": 40, "countdown": 0,
+					"ELEMENT": "THUNDER", "description": "SUMMONS A THUNDER STORM THAT RANDOMLY HITS ENEMIES, DEALING THUNDER DAMAGE TO THEM"}
+
+	learntAbilities = [Slash, Charge, Steal, SneakAttack, Absorb]
+	abilityBook = []
+
 class Player(object):
 	initStats = ["CLASS", "HP", "MP", "STR", "MagicSTR", "DEF", "SPEED", "EVASION"]
 	def __init__(self, startingClass, startingStats, nextLevel, equipped):
+		self.coords = []
 		# Max Stats used for calculations and display
 		self.currentStats = {"CLASS": startingClass, "LEVEL": 1, "MaxHP": startingStats["HP"],
 							 "MaxMP": startingStats["MP"], "MaxSTR": startingStats["STR"], "MaxMagicSTR": startingStats["MagicSTR"],
@@ -83,14 +132,14 @@ class Player(object):
 		if self.manaMultiplier < 1:
 			self.manaMultiplier = 1
 
-	def initMagicBook(self):
-		for spell in Magic.learntSpells:
+	def initBook(self, learntBook, book):
+		for item in learntBook:
 			try:
-				if self.currentStats["LEVEL"] >= spell["LEVEL"] and spell not in Magic.spellBook:
-					Magic.spellBook.append(spell)
-			except TypeError:
-				pass
-		Magic.selectedMagic = Magic.spellBook[0]
+				if self.currentStats["LEVEL"] >= item["LEVEL"] and self.currentStats['CLASS'] in item['CLASS'] and item not in book:  # Ability Check
+					book.append(item)
+			except KeyError:
+				if self.currentStats["LEVEL"] >= item["LEVEL"] and item not in book:  # Magic Check
+					book.append(item)
 
 	def initMagicLevel(self):
 		for spell in Magic.spellBook:
@@ -113,8 +162,9 @@ class Player(object):
 			screen.addstr(pos, 35, f"YOU ARE NOW LEVEL {self.currentStats['LEVEL']}")
 		if self.currentStats["CLASS"] in (Classes.Mage.stats["CLASS"], Classes.Wizard.stats["CLASS"]) and self.manaMultiplier < 1:
 			self.manaMultiplier = 1
-			self.initMagicBook()
+			self.initBook(Magic.learntSpells, Magic.spellBook)
 			self.initMagicLevel()
+		self.initBook(Abilities.learntAbilities, Abilities.abilityBook)
 		EquipmentStats(screen, self, charInventory)
 
 	def evolve(self, screen, pos, charInventory):

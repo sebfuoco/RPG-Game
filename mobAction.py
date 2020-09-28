@@ -1,6 +1,4 @@
 import random
-import curses
-import time
 import mobs
 from player import Magic
 from UI import colourEntity
@@ -59,6 +57,8 @@ def mobAttack(self, player, x, order, mobLocation):
 			mobDamage = 0
 		player.stats["HP"] -= mobDamage
 		self.addstr(pos, 35, f"{mobLocation[x][0]['name']} DID {mobDamage} DAMAGE")
+		colourEntity(self, player.coords[0], player.coords[1], {"ICON": "@"}, "NORMAL")
+		colourEntity(self, player.coords[0], player.coords[1], {"ICON": "@"}, False)
 		try:
 			if mobLocation[x][0]['inflict']:
 				statusEffect = random.randrange(0, 100)
@@ -77,13 +77,18 @@ def playerAttack(self, player, x, i, yCoord, xCoord, order, attackType, Maps, Ma
 	if attackType == "MAGIC" and Magic.selectedMagic["type"] == "OFFENSIVE":
 		if (player.stats["MP"] - Magic.selectedMagic["MANA"]) >= 0:
 			playerDamage = math.floor(player.currentStats["MaxMagicSTR"] * Magic.selectedMagic["POWER"])
-			if Magic.selectedMagic["ELEMENT"] == currentMobLocation.mobLocation[x][0]["weakness"]:
-				playerDamage *= 2
+			try:
+				if Magic.selectedMagic["ELEMENT"] == currentMobLocation.mobLocation[x][0]["weakness"][0]:
+					playerDamage *= currentMobLocation.mobLocation[x][0]["weakness"][1]
+			except KeyError:
+				pass
 			player.stats["MP"] -= Magic.selectedMagic["MANA"]
 			colourEntity(self, yCoord, xCoord, currentMobLocation.mobLocation[x][0], Magic.selectedMagic["ELEMENT"])
 			colourEntity(self, yCoord, xCoord, currentMobLocation.mobLocation[x][0], False)
 		else:
 			playerDamage = player.currentStats["MaxSTR"] - currentMobLocation.mobLocation[x][0]["DEF"]
+			colourEntity(self, yCoord, xCoord, currentMobLocation.mobLocation[x][0], "NORMAL")
+			colourEntity(self, yCoord, xCoord, currentMobLocation.mobLocation[x][0], False)
 	else:
 		playerDamage = math.floor(player.currentStats["MaxSTR"] - currentMobLocation.mobLocation[x][0]["DEF"])
 	if playerDamage < 0:

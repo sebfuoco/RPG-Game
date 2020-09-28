@@ -34,7 +34,10 @@ class mapNames:
 	southLuciaName = "SOUTH LUCIA"
 	northLuciaName = "NORTH LUCIA"
 	kingStarPubName = "KING STAR PUB"
-	allMapNames = [townName, homeName, elders_homeName, farmName, forestName, townSquareName, castleGateName, castleName, fieldName, caveName, southLuciaName, northLuciaName, kingStarPubName]
+	luciaGates = "LUCIA GATES"
+	abandonedChurch = "ABANDONED CHURCH"
+	allMapNames = [townName, homeName, elders_homeName, farmName, forestName, townSquareName, castleGateName, castleName,
+				   fieldName, caveName, southLuciaName, northLuciaName, kingStarPubName, luciaGates, abandonedChurch]
 
 class Maps:
 	from MapSettings import merchants
@@ -263,8 +266,8 @@ class Maps:
 				  ["ǁ.▒˄˄˄˄˄˄˄˄˄▒...▒˄˄˄˄˄˄˄˄˄˄˄˄▒.ǁ"],
 				  ["ǁ.▒▒▒▒▒▒▒▒▒▒▒...▒▒▒▒▒▒▒▒▒▒▒▒▒▒.ǁ"],
 				  ["+=============X================+"]]
-	northLuciaData = {"114": mapNames.northLuciaName, "1014": mapNames.southLuciaName}
-	northLuciaSpawn = [[1, 14, 0], [10, 14, 0]]
+	northLuciaData = {"114": mapNames.luciaGates, "1014": mapNames.southLuciaName}
+	northLuciaSpawn = [[1, 14, 1], [10, 14, 0]]
 	northLuciaInfo = initInfo(mapNames.northLuciaName)
 	allNorthLucia = [mapNames.northLuciaName, northLucia, northLuciaData, northLuciaSpawn, None, None, None, northLuciaInfo, None]
 
@@ -284,13 +287,53 @@ class Maps:
 	kingStarPubInfo = initInfo(mapNames.kingStarPubName)
 	allKingStarPub = [mapNames.kingStarPubName, kingStarPub, kingStarPubData, kingStarPubSpawn, kingStarPubMobs, None, None, kingStarPubInfo, None]
 
+	luciaGates = [["+=============X================+"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..................▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
+				  ["ǁ.................▒▒˄˄˄˄˄˄˄˄˄˄▒ǁ"],
+				  ["ǁ..................X˄˄˄˄˄˄˄˄˄˄▒ǁ"],
+				  ["ǁ.................▒▒˄˄˄˄˄˄˄˄˄˄▒ǁ"],
+				  ["ǁ..................▒▒▒▒▒▒▒▒▒▒▒▒ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ..............................ǁ"],
+				  ["ǁ            ...               ǁ"],
+				  ["ǁ            ...               ǁ"],
+				  ["+=============X================+"]]
+	luciaGatesData = {"114": mapNames.luciaGates, "1014": mapNames.northLuciaName, "418": mapNames.abandonedChurch}
+	luciaGatesSpawn = [[1, 14, 0], [10, 14, 0], [4, 18, 0]]
+	luciaGatesMobs = initMob(mapNames.luciaGates)
+	allLuciaGates = [mapNames.luciaGates, luciaGates, luciaGatesData, luciaGatesSpawn,
+						  luciaGatesMobs, None,
+						  None, None, None]
+
+	abandonedChruch = [["+=====================+"],
+					   ["ǁ........|...|........ǁ"],
+					   ["ǁ.....................ǁ"],
+					   ["ǁ.+------+...+------+.ǁ"],
+					   ["ǁ.....................ǁ"],
+					   ["ǁ.+------+...+------+.ǁ"],
+					   ["ǁ.....................ǁ"],
+					   ["ǁ.+------+...+------+.ǁ"],
+					   ["ǁ.....................ǁ"],
+					   ["X.....................ǁ"],
+					   ["ǁ.....................ǁ"],
+					   ["+=====================+"]]
+	abandonedChruchData = {"91": mapNames.luciaGates}
+	abandonedChruchSpawn = [[9, 1, 2]]
+	abandonedChruchMobs = initMob(mapNames.abandonedChurch)
+	abandonedChruchInfo = initInfo(mapNames.abandonedChurch)
+	allAbandonedChurch = [mapNames.abandonedChurch, abandonedChruch, abandonedChruchData, abandonedChruchSpawn, abandonedChruchMobs, None,
+					  None, abandonedChruchInfo, None]
+
 	# allMap template [mapName, map, mapData, mapSpawn, mapMobs, mapChests, mapQuest, mapInfo, mapMerchants]
-	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allCastle, allThroneCastle, allCastleBasement, allField, allCave, allSouthLucia, allNorthLucia, allKingStarPub]
+	allMaps = [allTown, allHome, allElderHome, allFarm, allForest, allTownSquare, allCastleGate, allCastle, allThroneCastle,
+			   allCastleBasement, allField, allCave, allSouthLucia, allNorthLucia, allKingStarPub, allLuciaGates, allAbandonedChurch]
 
 	quickStartMap = [[town, mapNames.townName, townData, townSpawn, None, None, None, None, merchants.townMerchant],
 					 [townSquare, mapNames.townSquareName, townSquareData, townSquareSpawn, None, None, townSquareQuest, townSquareInfo, merchants.townSquareMerchant],
-					 [castle, mapNames.castleName, castleData, castleSpawn, castleMobs, None, None, None, None]]
-	i = 1
+					 [castle, mapNames.castleName, castleData, castleSpawn, castleMobs, None, None, None, None],
+					 [northLucia, mapNames.northLuciaName, northLuciaData, northLuciaSpawn, None, None, None, northLuciaInfo, None]]
+	i = 3
 	currentMap = quickStartMap[i][0]
 	currentMapName = quickStartMap[i][1]
 	currentMapData = quickStartMap[i][2]
