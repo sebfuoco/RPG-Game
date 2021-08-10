@@ -54,6 +54,7 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
         xCoord += 1
     x = MapAction.detectCollision(self, yCoord, xCoord, mobs.mobIcons.mobs)
     if x:
+        player.coords = [yCoord, xCoord]
         if x == "loadMap":
             yCoord, xCoord, spawnLocation, size = loadMap(self, originalCoord["yCoord"], originalCoord["xCoord"], player)
             yCoord, xCoord = MapAction.moveEntity(self, color_pair, yCoord, xCoord, "@", 16)
@@ -105,6 +106,7 @@ def move(self, color_pair, direction, yCoord, xCoord, spawnLocation, player, att
             yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
             self.refresh()
         elif x == "Attack":
+            player.coords = [originalCoord["yCoord"], originalCoord["xCoord"]]
             attack(self, player, yCoord, xCoord, attackType, Maps, MapAction, mobs.currentMobLocation, mainUI.charInventoryUI, newLine)
             yCoord, xCoord = MapAction.moveEntity(self, color_pair, originalCoord["yCoord"], originalCoord["xCoord"], "@", 16)
             if player.status == "POISONED":
@@ -138,6 +140,7 @@ def main(main):
     for i in range(0, 100):
         curses.init_pair(i + 1, i, 0)
     """
+    #show all colours
     for i in range(0, 256):
         screen.addstr(str(i), curses.color_pair(i))
     screen.refresh()
